@@ -1,4 +1,4 @@
 export default definePageConfig({
-  navigationBarTitleText: '',
+  navigationBarTitleText: '视界',
   navigationStyle: 'custom',
 });

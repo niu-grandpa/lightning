@@ -1,4 +1,4 @@
 export default definePageConfig({
-  navigationBarTitleText: '',
+  navigationBarTitleText: '小说',
   navigationStyle: 'custom',
 });

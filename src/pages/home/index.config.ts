@@ -1,4 +1,4 @@
 export default definePageConfig({
-  navigationBarTitleText: '',
+  navigationBarTitleText: '首页',
   navigationStyle: 'custom',
 });

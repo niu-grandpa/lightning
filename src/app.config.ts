@@ -1,7 +1,9 @@
 import routes from './pages/routes';
 
+const { index, home, horizon, novel, person } = routes;
+
 export default defineAppConfig({
-  pages: [...routes.index],
+  pages: [...index, ...home, ...horizon, ...novel, ...person],
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#fff',
