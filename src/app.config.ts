@@ -1,13 +1,13 @@
 import routes from './pages/routes';
 
-const { index, home, horizon, novel, person } = routes;
+const { index, news, horizon, novel, person } = routes;
 
 export default defineAppConfig({
-  pages: [...index, ...home, ...horizon, ...novel, ...person],
+  pages: [...index, ...news, ...horizon, ...novel, ...person],
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#fff',
-    navigationBarTitleText: 'WeChat',
+    navigationBarTitleText: '',
     navigationBarTextStyle: 'black',
   },
 });
