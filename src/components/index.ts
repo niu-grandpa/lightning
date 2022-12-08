@@ -1,3 +1,4 @@
-import HomeViews from './home-views.vue';
+import HomeSearchView from './home-search-view.vue';
+import MyContainer from './page-container.vue';
 
-export { HomeViews };
+export { HomeSearchView, MyContainer };
