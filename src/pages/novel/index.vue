@@ -1,5 +1,5 @@
 <template>
-  <section></section>
+  <section>小说</section>
 </template>
 
 <script setup lang="ts">

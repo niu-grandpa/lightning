@@ -1,5 +1,5 @@
 <template>
-  <section></section>
+  <section>头条</section>
 </template>
 
 <script setup lang="ts">

@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import setupUIComps from './setup_components';
+import setupUIComps from './assets/setup_components';
 
 import './app.less';
 

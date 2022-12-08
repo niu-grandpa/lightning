@@ -1,5 +1,6 @@
 /// <reference types="@tarojs/taro" />
 
+declare module '*.vue';
 declare module '*.png';
 declare module '*.gif';
 declare module '*.jpg';
@@ -13,10 +14,10 @@ declare module '*.styl';
 
 declare namespace NodeJS {
   interface ProcessEnv {
-    TARO_ENV: 'weapp' | 'swan' | 'alipay' | 'h5' | 'rn' | 'tt' | 'quickapp' | 'qq' | 'jd'
+    TARO_ENV: 'weapp' | 'swan' | 'alipay' | 'h5' | 'rn' | 'tt' | 'quickapp' | 'qq' | 'jd';
   }
 }
 
 declare module '@tarojs/components' {
-  export * from '@tarojs/components/types/index.vue3'
+  export * from '@tarojs/components/types/index.vue3';
 }

@@ -1,23 +1,19 @@
 <script setup lang="ts">
-import Taro from '@tarojs/taro';
 import { ref, nextTick, onBeforeUnmount } from 'vue';
+import { HomeViews } from '../../components';
 import background from '../../../public/index.png';
 
-let timer: NodeJS.Timeout;
 const showMainImage = ref(false);
 
-nextTick(handleShowMainImage);
-
-onBeforeUnmount(() => {
-  clearTimeout(timer);
-});
-
-function handleShowMainImage() {
+let timer: NodeJS.Timeout;
+nextTick(() => {
   showMainImage.value = true;
   timer = setTimeout(() => {
     showMainImage.value = false;
   }, 2000);
-}
+});
+
+onBeforeUnmount(() => clearTimeout(timer));
 </script>
 
 <template>
@@ -26,6 +22,7 @@ function handleShowMainImage() {
       <img class="index-background-img" :src="background" alt="background-image" />
     </section>
   </nut-popup>
+  <home-views />
 </template>
 
 <style lang="less">
