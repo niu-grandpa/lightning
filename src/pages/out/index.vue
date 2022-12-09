@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import Taro from '@tarojs/taro';
-import { ref } from 'vue';
-
-// 设置为通过路由传参过来的第三方链接
-const src = ref('');
+const { search } = Taro.useRouter().params;
 </script>
 
 <template>
-  <web-view :src="src" />
+  <web-view :src="search" />
 </template>
 
 <style lang="less">

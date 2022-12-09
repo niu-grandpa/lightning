@@ -2,10 +2,18 @@
 import Taro from '@tarojs/taro';
 import { ref } from 'vue';
 import { MyContainer } from '.';
+import { engineIcons } from '../assets/icons';
 
 const visible = ref(false);
 const searchValue = ref('');
 const searchResult = ref([]);
+const engineTapIdx = ref(-1);
+
+const handleChangeEngine = () => {
+  Taro.showActionSheet({ itemList: ['搜索大全', '百度', '谷歌', '搜狗'] }).then(({ tapIndex }) => {
+    engineTapIdx.value = tapIndex;
+  });
+};
 
 const handleMicro = () => {
   Taro.showToast({ title: '尽请期待' });
@@ -19,8 +27,8 @@ const handleScan = () => {
   });
 };
 
-const handleToWebView = () => {
-  Taro.navigateTo({ url: '../out/index' });
+const handleToWebView = (state = '') => {
+  Taro.navigateTo({ url: `../out/index?search=${state}` });
 };
 </script>
 
@@ -30,7 +38,7 @@ const handleToWebView = () => {
     clearable
     :border="false"
     class="home-search"
-    left-icon="search"
+    left-icon="search2"
     @click-input="visible = true"
     placeholder="搜索或输入网址"
   >
@@ -46,32 +54,59 @@ const handleToWebView = () => {
     v-model:visible="visible"
     class="home-search-view"
   >
-    <my-container v-if="visible" class="home-search-view">
-      <nut-searchbar
-        v-model="searchValue"
-        autofocus
-        input-background="#efefef"
-        style="padding: 0"
-        placeholder="搜索或输入网址"
-      >
-        <template #leftout>
-          <nut-icon name="left" size="20" @click="visible = false" />
-        </template>
-        <template #leftin>
-          <nut-icon size="16" name="search2" />
-        </template>
-        <template #rightin>
-          <nut-icon name="microphone" @click="handleMicro" />
-        </template>
-      </nut-searchbar>
+    <nut-searchbar
+      v-model="searchValue"
+      autofocus
+      input-background="#efefef"
+      style="padding: 0 14px"
+      placeholder="搜索或输入网址"
+    >
+      <template #leftout>
+        <nut-icon name="left" size="20" @click="visible = false" />
+      </template>
+      <template #leftin>
+        <nut-icon v-if="engineTapIdx === 1" :name="engineIcons[1]" @click="handleChangeEngine" />
+        <nut-icon
+          v-else-if="engineTapIdx === 2"
+          :name="engineIcons[2]"
+          @click="handleChangeEngine"
+        />
+        <nut-icon
+          v-else-if="engineTapIdx === 3"
+          :name="engineIcons[3]"
+          @click="handleChangeEngine"
+        />
+        <nut-icon v-else size="18" :name="engineIcons[0]" @click="handleChangeEngine" />
+      </template>
+      <template #rightin>
+        <nut-icon name="microphone" @click="handleMicro" />
+      </template>
+    </nut-searchbar>
 
+    <my-container class="home-search-view">
       <nut-cell-group v-if="searchResult.length">
-        <nut-cell v-for="item in searchResult" title="" is-link @click="handleToWebView">
+        <nut-cell
+          v-for="item in searchResult"
+          :title="item"
+          is-link
+          @click="() => handleToWebView()"
+        >
           <template #icon>
             <nut-icon name="search2" style="margin-right: 8px" />
           </template>
         </nut-cell>
       </nut-cell-group>
+
+      <nut-cell
+        v-show="searchValue"
+        :title="`百度一下: ${searchValue}`"
+        is-link
+        @click="() => handleToWebView(searchValue)"
+      >
+        <template #icon>
+          <img width="20px" height="20px" style="margin-right: 6px" :src="engineIcons[1]" />
+        </template>
+      </nut-cell>
     </my-container>
   </nut-popup>
 </template>
