@@ -1,14 +1,13 @@
 import routes from './assets/routes';
 
-const { index, home, horizon, novel, person } = routes;
+const { index, home, video, horizon, novel, person, out } = routes;
 
 export default defineAppConfig({
-  pages: [...index, ...home, ...horizon, ...novel, ...person],
+  pages: [...index, ...home, ...video, ...horizon, ...novel, ...person, ...out],
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#fff',
     navigationBarTitleText: '',
     navigationBarTextStyle: 'black',
   },
-  lazyCodeLoading: 'requiredComponents',
 });

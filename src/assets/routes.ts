@@ -3,13 +3,16 @@
 
 const INDEX = 'pages/index';
 const HOME = 'pages/home';
+const VIDEO = 'pages/video';
 const HORIZON = 'pages/horizon';
 const NOVEL = 'pages/novel';
 const PERSON = 'pages/person';
 
 export default {
   index: [`${INDEX}/index`],
+  out: ['pages/out/index'],
   home: [],
+  video: [],
   horizon: [],
   novel: [],
   person: [],

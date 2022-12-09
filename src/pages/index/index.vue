@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { ref, nextTick, onBeforeUnmount, defineAsyncComponent, computed } from 'vue';
+import { ref, nextTick, onBeforeUnmount, onMounted, shallowRef } from 'vue';
+import TabbarItem, { type TabbarItemObj } from '../../assets/tabbar-item';
 import { MyContainer } from '../../components';
 import background from '../../../public/index.png';
 
 let timer: NodeJS.Timeout;
 
-const asyncComps = computed(() => ({
-  home: defineAsyncComponent(() => import('../home/index.vue')),
-  horizon: defineAsyncComponent(() => import('../person/index.vue')),
-  novel: defineAsyncComponent(() => import('../novel/index.vue')),
-  person: defineAsyncComponent(() => import('../horizon/index.vue')),
-}));
-
+const asyncComps = shallowRef<Record<string, TabbarItemObj['component']>>({});
 const showIndexImage = ref(false);
 const currentTab = ref('home');
+
+onBeforeUnmount(() => clearTimeout(timer));
+
+onMounted(() => {
+  TabbarItem.forEach(({ name, component }) => {
+    asyncComps.value[name] = component;
+  });
+});
 
 nextTick(() => {
   showIndexImage.value = true;
@@ -21,8 +24,6 @@ nextTick(() => {
     showIndexImage.value = false;
   }, 2000);
 });
-
-onBeforeUnmount(() => clearTimeout(timer));
 </script>
 
 <template>
@@ -37,10 +38,13 @@ onBeforeUnmount(() => clearTimeout(timer));
   </my-container>
 
   <nut-tabbar v-model:visible="currentTab" bottom safeAreaInsetBottom active-color="#1989fa">
-    <nut-tabbar-item tab-title="首页" name="home" icon="home" />
-    <nut-tabbar-item tab-title="视界" name="horizon" icon="find" />
-    <nut-tabbar-item tab-title="小说" name="novel" icon="horizontal-n" />
-    <nut-tabbar-item tab-title="我的" name="person" icon="my" />
+    <nut-tabbar-item
+      v-for="item in TabbarItem"
+      :tab-title="item.text"
+      :name="item.name"
+      :icon="item.icon"
+      :key="item.name"
+    />
   </nut-tabbar>
 </template>
 

@@ -7,7 +7,7 @@
 <style>
 .container {
   height: 100vh;
-  padding: 0 20px;
+  padding: 0 14px;
   overflow-y: auto;
   background: #fcfcfc;
 }

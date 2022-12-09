@@ -12,6 +12,7 @@ import {
   CellGroup,
   SearchBar,
   Input,
+  Video,
 } from '@nutui/nutui-taro';
 
 export default (app: App) => {
@@ -27,6 +28,7 @@ export default (app: App) => {
     CellGroup,
     SearchBar,
     Input,
+    Video,
   ];
   usePlugins(app, plugins);
 };
