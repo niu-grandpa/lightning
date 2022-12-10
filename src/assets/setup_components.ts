@@ -13,6 +13,8 @@ import {
   SearchBar,
   Input,
   Video,
+  Skeleton,
+  Avatar,
 } from '@nutui/nutui-taro';
 
 export default (app: App) => {
@@ -29,6 +31,8 @@ export default (app: App) => {
     SearchBar,
     Input,
     Video,
+    Skeleton,
+    Avatar,
   ];
   usePlugins(app, plugins);
 };

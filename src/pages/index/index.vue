@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, onBeforeUnmount, onMounted, shallowRef } from 'vue';
+import { ref, nextTick, onBeforeUnmount, onBeforeMount, shallowRef } from 'vue';
 import TabbarItem, { type TabbarItemObj } from '../../assets/tabbar-item';
 import { MyContainer } from '../../components';
 import background from '../../../public/index.png';
@@ -10,13 +10,13 @@ const asyncComps = shallowRef<Record<string, TabbarItemObj['component']>>({});
 const showIndexImage = ref(false);
 const currentTab = ref('home');
 
-onBeforeUnmount(() => clearTimeout(timer));
-
-onMounted(() => {
+onBeforeMount(() => {
   TabbarItem.forEach(({ name, component }) => {
     asyncComps.value[name] = component;
   });
 });
+
+onBeforeUnmount(() => clearTimeout(timer));
 
 nextTick(() => {
   showIndexImage.value = true;
@@ -33,8 +33,8 @@ nextTick(() => {
     </section>
   </nut-popup>
 
-  <my-container>
-    <component v-if="!showIndexImage" :is="asyncComps[currentTab]" />
+  <my-container v-if="!showIndexImage">
+    <Suspense><component :is="asyncComps[currentTab]" /></Suspense>
   </my-container>
 
   <nut-tabbar v-model:visible="currentTab" bottom safeAreaInsetBottom active-color="#1989fa">

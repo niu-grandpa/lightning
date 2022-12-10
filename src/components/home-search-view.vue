@@ -1,18 +1,58 @@
 <script setup lang="ts">
 import Taro from '@tarojs/taro';
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { MyContainer } from '.';
 import { engineIcons } from '../assets/icons';
+import {
+  getSMSearchKeywords,
+  getBaiduSearchKeywords,
+  getBingSearchKeywords,
+} from '../assets/https';
+
+const engineObj = {
+  zh: ['神马', '百度', '必应'],
+  en: ['shenma', 'baidu', 'bing'],
+  methods: [getSMSearchKeywords, getBaiduSearchKeywords, getBingSearchKeywords],
+};
 
 const visible = ref(false);
 const searchValue = ref('');
-const searchResult = ref([]);
-const engineTapIdx = ref(-1);
+const searchList = ref<string[]>([]);
+const engineIdx = ref(0);
+
+const initData = () => {
+  if (visible.value) return;
+  engineIdx.value = 0;
+  searchValue.value = '';
+  searchList.value.length = 0;
+};
+
+const handleSearch = async () => {
+  initData();
+  if (!searchValue.value) {
+    searchList.value.length = 0;
+    return;
+  }
+  const searchApi = engineObj.methods[engineIdx.value];
+  const data = await searchApi(searchValue.value);
+  searchList.value.length && (searchList.value.length = 0);
+  searchList.value.push(...data);
+};
+
+watchEffect(() => {
+  handleSearch();
+});
 
 const handleChangeEngine = () => {
-  Taro.showActionSheet({ itemList: ['搜索大全', '百度', '谷歌', '搜狗'] }).then(({ tapIndex }) => {
-    engineTapIdx.value = tapIndex;
+  Taro.showActionSheet({ itemList: engineObj.zh }).then(({ tapIndex }) => {
+    engineIdx.value = tapIndex;
+    searchList.value.length = 0;
+    handleSearch();
   });
+};
+
+const handleToWebView = (state: string, idx = 0) => {
+  Taro.navigateTo({ url: `../out/index?search=${state}&engine=${engineObj.en[idx]}` });
 };
 
 const handleMicro = () => {
@@ -25,10 +65,6 @@ const handleScan = () => {
       title: JSON.stringify(res.result),
     });
   });
-};
-
-const handleToWebView = (state = '') => {
-  Taro.navigateTo({ url: `../out/index?search=${state}` });
 };
 </script>
 
@@ -53,6 +89,7 @@ const handleToWebView = (state = '') => {
     :overlay="false"
     v-model:visible="visible"
     class="home-search-view"
+    position="right"
   >
     <nut-searchbar
       v-model="searchValue"
@@ -65,17 +102,8 @@ const handleToWebView = (state = '') => {
         <nut-icon name="left" size="20" @click="visible = false" />
       </template>
       <template #leftin>
-        <nut-icon v-if="engineTapIdx === 1" :name="engineIcons[1]" @click="handleChangeEngine" />
-        <nut-icon
-          v-else-if="engineTapIdx === 2"
-          :name="engineIcons[2]"
-          @click="handleChangeEngine"
-        />
-        <nut-icon
-          v-else-if="engineTapIdx === 3"
-          :name="engineIcons[3]"
-          @click="handleChangeEngine"
-        />
+        <nut-icon v-if="engineIdx === 1" :name="engineIcons[1]" @click="handleChangeEngine" />
+        <nut-icon v-else-if="engineIdx === 2" :name="engineIcons[2]" @click="handleChangeEngine" />
         <nut-icon v-else size="18" :name="engineIcons[0]" @click="handleChangeEngine" />
       </template>
       <template #rightin>
@@ -84,36 +112,45 @@ const handleToWebView = (state = '') => {
     </nut-searchbar>
 
     <my-container class="home-search-view">
-      <nut-cell-group v-if="searchResult.length">
+      <nut-skeleton
+        width="320px"
+        height="18px"
+        style="margin-top: 25px; margin-left: 25px"
+        animated
+        row="3"
+        :loading="searchValue !== '' && !searchList.length"
+      >
+        <nut-cell-group>
+          <nut-cell
+            v-for="word in searchList"
+            :title="word"
+            :key="word"
+            is-link
+            @click="() => handleToWebView(word, engineIdx)"
+          >
+            <template #icon>
+              <nut-icon name="search2" style="margin-right: 8px" />
+            </template>
+          </nut-cell>
+        </nut-cell-group>
         <nut-cell
-          v-for="item in searchResult"
-          :title="item"
+          v-show="searchValue"
+          :title="`百度一下: ${searchValue}`"
           is-link
-          @click="() => handleToWebView()"
+          @click="() => handleToWebView(searchValue, 1)"
         >
           <template #icon>
-            <nut-icon name="search2" style="margin-right: 8px" />
+            <img width="20px" height="20px" style="margin-right: 6px" :src="engineIcons[1]" />
           </template>
         </nut-cell>
-      </nut-cell-group>
-
-      <nut-cell
-        v-show="searchValue"
-        :title="`百度一下: ${searchValue}`"
-        is-link
-        @click="() => handleToWebView(searchValue)"
-      >
-        <template #icon>
-          <img width="20px" height="20px" style="margin-right: 6px" :src="engineIcons[1]" />
-        </template>
-      </nut-cell>
+      </nut-skeleton>
     </my-container>
   </nut-popup>
 </template>
 
 <style lang="less">
 .home-search {
-  border: 2px solid #666;
+  border: 2px solid #999;
   border-radius: 20px;
   .nut-icon {
     border: none;
