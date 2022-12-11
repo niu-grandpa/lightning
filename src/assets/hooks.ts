@@ -1,4 +1,6 @@
-import { computed, ref, type App, type Plugin } from 'vue';
+import Taro from '@tarojs/taro';
+import { computed, onMounted, ref, watchEffect, type App, type Plugin } from 'vue';
+import { type GetNewsParams, type NewsListResult, getNewsList } from './https';
 
 export type EngineApi = 'shenma' | 'baidu' | 'bing';
 
@@ -18,6 +20,11 @@ type BingData = Record<
     }>;
   }
 >;
+
+type UseGetNewsListReturnType = {
+  list: NewsListResult[];
+  success: boolean;
+};
 
 export function usePlugins(vue: App, plugins: Plugin[]) {
   plugins.forEach(plugin => {
@@ -89,3 +96,49 @@ export function useSearchEngine(type: EngineApi, word: string) {
   });
   return computed(() => engineApi.value[type]);
 }
+
+/**
+ * useGetNewsList
+ * @description 获取新闻接口列表数据
+ * @param {object} data 接口所需参数
+ * @param {Function} callback 接口调用成功时执行该回调
+ * @returns 返回一个用于重新加载接口的函数
+ */
+export const useGetNewsList = (
+  data: GetNewsParams,
+  callback: (res: UseGetNewsListReturnType) => void,
+  failed?: () => void
+): (() => void) => {
+  const success = ref(false);
+  const list = ref<NewsListResult[]>([]);
+
+  const result = computed(() => ({
+    list: list.value,
+    success: success.value,
+  }));
+
+  const request = async () => {
+    success.value = false;
+    try {
+      const { result } = await getNewsList(data);
+      success.value = true;
+      list.value.length && (list.value.length = 0);
+      list.value.push(...result.list);
+    } catch (error) {
+      failed?.();
+      Taro.showToast({ title: '网络似乎开小差了~', icon: 'none' });
+      console.log('[useGetNewsList] ', error);
+    }
+  };
+
+  const onReload = () => request();
+
+  onMounted(() => {
+    onReload();
+    watchEffect(() => {
+      success.value && callback(result.value);
+    });
+  });
+
+  return onReload;
+};

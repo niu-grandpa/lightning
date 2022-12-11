@@ -15,6 +15,12 @@ import {
   Video,
   Skeleton,
   Avatar,
+  Layout,
+  Row,
+  Col,
+  Empty,
+  Tag,
+  InfiniteLoading,
 } from '@nutui/nutui-taro';
 
 export default (app: App) => {
@@ -33,6 +39,12 @@ export default (app: App) => {
     Video,
     Skeleton,
     Avatar,
+    Layout,
+    Row,
+    Col,
+    Empty,
+    Tag,
+    InfiniteLoading,
   ];
   usePlugins(app, plugins);
 };

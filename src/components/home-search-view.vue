@@ -15,6 +15,8 @@ const engineObj = {
   methods: [getSMSearchKeywords, getBaiduSearchKeywords, getBingSearchKeywords],
 };
 
+defineProps<{ fixed?: boolean }>();
+
 const visible = ref(false);
 const searchValue = ref('');
 const searchList = ref<string[]>([]);
@@ -74,7 +76,8 @@ const handleScan = () => {
     clearable
     :border="false"
     class="home-search"
-    left-icon="search2"
+    :class="{ 'home-search-fixed': $props.fixed }"
+    :left-icon="!$props.fixed ? 'search2' : ''"
     @click-input="visible = true"
     placeholder="搜索或输入网址"
   >
@@ -95,8 +98,9 @@ const handleScan = () => {
       v-model="searchValue"
       autofocus
       input-background="#efefef"
-      style="padding: 0 14px"
+      style="padding: 95px 14px 0"
       placeholder="搜索或输入网址"
+      @search="handleSearch"
     >
       <template #leftout>
         <nut-icon name="left" size="20" @click="visible = false" />
@@ -133,29 +137,33 @@ const handleScan = () => {
             </template>
           </nut-cell>
         </nut-cell-group>
-        <nut-cell
-          v-show="searchValue"
-          :title="`百度一下: ${searchValue}`"
-          is-link
-          @click="() => handleToWebView(searchValue, 1)"
-        >
-          <template #icon>
-            <img width="20px" height="20px" style="margin-right: 6px" :src="engineIcons[1]" />
-          </template>
-        </nut-cell>
       </nut-skeleton>
+
+      <nut-cell
+        v-show="searchValue"
+        :title="`百度一下: ${searchValue}`"
+        is-link
+        @click="() => handleToWebView(searchValue, 1)"
+      >
+        <template #icon>
+          <img width="20px" height="20px" style="margin-right: 6px" :src="engineIcons[1]" />
+        </template>
+      </nut-cell>
     </my-container>
   </nut-popup>
 </template>
 
 <style lang="less">
 .home-search {
-  border: 2px solid #999;
-  border-radius: 20px;
+  border: 2px solid #d3d3d3;
+  border-radius: 40px;
+  transition: all 0.2s;
   .nut-icon {
     border: none;
   }
   &-view {
+    position: fixed;
+    z-index: 9999;
     .nut-searchbar {
       background: transparent;
       &__search-input {
@@ -165,6 +173,13 @@ const handleScan = () => {
         box-shadow: none;
       }
     }
+  }
+  &-fixed {
+    width: 74%;
+    position: fixed;
+    top: 46px;
+    left: 0;
+    z-index: 999;
   }
 }
 </style>

@@ -1,14 +1,7 @@
 <template>
-  <section class="container">
-    <slot />
-  </section>
+  <scroll-view style="height: calc(100vh - 86px); background: #fcfcfc">
+    <section>
+      <slot />
+    </section>
+  </scroll-view>
 </template>
-
-<style>
-.container {
-  height: 94vh;
-  padding: 0 14px;
-  overflow-y: auto;
-  background: #fcfcfc;
-}
-</style>
