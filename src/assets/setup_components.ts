@@ -21,6 +21,10 @@ import {
   Empty,
   Tag,
   InfiniteLoading,
+  Tabs,
+  TabPane,
+  Sticky,
+  BackTop,
 } from '@nutui/nutui-taro';
 
 export default (app: App) => {
@@ -45,6 +49,10 @@ export default (app: App) => {
     Empty,
     Tag,
     InfiniteLoading,
+    Tabs,
+    TabPane,
+    Sticky,
+    BackTop,
   ];
   usePlugins(app, plugins);
 };

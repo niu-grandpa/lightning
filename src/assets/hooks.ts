@@ -105,10 +105,9 @@ export function useSearchEngine(type: EngineApi, word: string) {
  * @returns 返回一个用于重新加载接口的函数
  */
 export const useGetNewsList = (
-  data: GetNewsParams,
   callback: (res: UseGetNewsListReturnType) => void,
   failed?: () => void
-): (() => void) => {
+): ((data: GetNewsParams) => void) => {
   const success = ref(false);
   const list = ref<NewsListResult[]>([]);
 
@@ -117,7 +116,7 @@ export const useGetNewsList = (
     success: success.value,
   }));
 
-  const request = async () => {
+  const request = async (data: GetNewsParams) => {
     success.value = false;
     try {
       const { result } = await getNewsList(data);
@@ -131,13 +130,10 @@ export const useGetNewsList = (
     }
   };
 
-  const onReload = () => request();
+  const onReload = (data: GetNewsParams) => request(data);
 
-  onMounted(() => {
-    onReload();
-    watchEffect(() => {
-      success.value && callback(result.value);
-    });
+  watchEffect(() => {
+    success.value && callback(result.value);
   });
 
   return onReload;

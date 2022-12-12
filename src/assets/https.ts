@@ -2,13 +2,35 @@ import Taro from '@tarojs/taro';
 import { useNormalizeSearchResult } from './hooks';
 
 export type GetNewsParams = {
-  /**	频道(头条，新闻，国内，国际，政治，财经，体育，娱乐，军事，教育，科技，NBA，股票，星座，女性，健康，育儿) */
-  channel: string;
+  /**	频道 */
+  channel: NewsCategory;
   /**数量 */
   num: number;
   /**起始位置 */
   start: number;
 };
+
+/**
+ * 新闻分类
+ *
+ * 头条，新闻，国内，国际，政治，财经，体育，娱乐，军事，教育，科技，NBA，股票，星座，女性，健康，育儿
+ */
+export enum NewsCategory {
+  HOTSPOT = '头条',
+  NEWS = '新闻',
+  HOME = '国内',
+  INTERNATION = '国际',
+  POLITICS = '政治',
+  FINANCE = '财经',
+  SPORTS = '体育',
+  ENTERTAINMENT = '娱乐',
+  MILITARY = '军事',
+  EDUCATE = '教育',
+  TECHNOLOGY = '科技',
+  NBA = 'NBA',
+  STOCK = '股票',
+  HEALTHY = '健康',
+}
 
 export interface GetNewsReturnType {
   status: string;

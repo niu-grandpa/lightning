@@ -7,10 +7,11 @@ const VIDEO = 'pages/video';
 const HORIZON = 'pages/horizon';
 const NOVEL = 'pages/novel';
 const PERSON = 'pages/person';
+const OUT = 'pages/out';
 
 export default {
   index: [`${INDEX}/index`],
-  out: ['pages/out/index'],
+  out: [`${OUT}/index`, `${OUT}/news-detail`],
   home: [],
   video: [],
   horizon: [],
