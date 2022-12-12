@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import Taro from '@tarojs/taro';
+import { ref } from 'vue';
 import { type NewsListResult } from '../../assets/https';
 
 const { info } = Taro.getCurrentInstance().preloadData! as Record<string, NewsListResult>;
+const like = ref(Math.round(Math.random() * 999));
 </script>
 
 <template>
@@ -10,6 +12,7 @@ const { info } = Taro.getCurrentInstance().preloadData! as Record<string, NewsLi
     <template #content>
       <main class="detail">
         <h1 class="detail-title">{{ info.title }}</h1>
+
         <nut-row class="detail-src">
           <nut-col :span="4">
             <nut-avatar :icon="info.pic" />
@@ -19,7 +22,24 @@ const { info } = Taro.getCurrentInstance().preloadData! as Record<string, NewsLi
             <p class="detail-src-time">{{ info.time }}</p>
           </nut-col>
         </nut-row>
+
         <section class="detail-content" v-html="info.content" />
+
+        <nut-grid direction="horizontal" icon-size="20px" :border="false" :column-num="3">
+          <nut-grid-item icon="https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico">
+            <template #text>
+              <button class="init-btn" open-type="share">微信</button>
+            </template>
+          </nut-grid-item>
+          <nut-grid-item
+            icon="https://img.ixintu.com/download/jpg/20210107/07bf0e16c47e727c023377b24ca29f70_512_512.jpg!bg"
+          >
+            <template #text>
+              <button class="init-btn" open-type="share">朋友圈</button>
+            </template>
+          </nut-grid-item>
+          <nut-grid-item icon="fabulous" :text="`${like}`" />
+        </nut-grid>
       </main>
     </template>
   </nut-backtop>

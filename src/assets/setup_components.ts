@@ -25,6 +25,8 @@ import {
   TabPane,
   Sticky,
   BackTop,
+  Grid,
+  GridItem,
 } from '@nutui/nutui-taro';
 
 export default (app: App) => {
@@ -53,6 +55,8 @@ export default (app: App) => {
     TabPane,
     Sticky,
     BackTop,
+    Grid,
+    GridItem,
   ];
   usePlugins(app, plugins);
 };

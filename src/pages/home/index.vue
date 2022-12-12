@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, watchEffect } from 'vue';
-import { HomeSearchView, HomeResult, MyContainer } from '../../components';
+import { HomeSearchView, HomeResult, MyContainer, ReloadButton } from '../../components';
 import { useGetNewsList } from '../../assets/hooks';
 import { NewsCategory, type NewsListResult } from '../../assets/https';
 import Taro from '@tarojs/taro';
@@ -12,40 +12,59 @@ type NewsListType = {
   };
 };
 
+const HOTSPOT = 'HOTSPOT';
+
 const error = ref(false);
 const loading = ref(true);
 const isFixedInput = ref(false);
 const refreshHasMore = ref(true);
-
 const tabTitle = ref<{ title: string; key: string }[]>([]);
-const tabChannel = ref('HOTSPOT');
+const tabChannel = ref('NEWS');
 const newsList = reactive<NewsListType>({});
 const newsDetailInfo = ref<NewsListResult | {}>({});
+
+const isGetNews = () => tabChannel.value === 'NEWS';
+const handleTabs = ({ paneKey }) => updateList(paneKey);
+const handleScroll = ({ detail }) => (isFixedInput.value = detail.scrollTop >= 198);
+
+const initData = () => {
+  Object.keys(NewsCategory).forEach(key => {
+    const title = NewsCategory[key];
+    if (title !== NewsCategory[HOTSPOT]) {
+      tabTitle.value.push({ title: title === '新闻' ? '推荐' : title, key });
+    }
+    newsList[key] = { start: -1, result: [] };
+  });
+  updateList();
+};
+
+const updateList = (channel?: string) => {
+  tabChannel.value = channel || tabChannel.value;
+
+  let { start } = newsList[tabChannel.value];
+  start++;
+
+  newsList[tabChannel.value].start = start;
+  // 当获取新闻频道数据的同时获取"头条"数据
+  if (isGetNews()) {
+    newsList[HOTSPOT].start = start;
+    loadList({ channel: NewsCategory[HOTSPOT], start, num: 5 });
+  }
+
+  loadList({ channel: NewsCategory[tabChannel.value], start, num: 5 });
+};
 
 const loadList = useGetNewsList(
   ({ list, success }) => {
     error.value = !success;
     loading.value = !success;
     newsList[tabChannel.value].result = list;
+    isGetNews() && (newsList[HOTSPOT].result = list);
   },
   () => (error.value = true)
 );
 
-const updateList = (channel?: string) => {
-  tabChannel.value = channel || tabChannel.value;
-  let { start } = newsList[tabChannel.value];
-  newsList[tabChannel.value].start = ++start;
-  loadList({ channel: NewsCategory[tabChannel.value], start, num: 5 });
-};
-
-const initData = () => {
-  Object.keys(NewsCategory).forEach(key => {
-    const title = NewsCategory[key];
-    tabTitle.value.push({ title, key });
-    newsList[key] = { start: 0, result: [] };
-  });
-  updateList();
-};
+const refreshLoadMore = (done: () => void) => {};
 
 const goToDetailPage = () => {
   if (!Object.keys(newsDetailInfo.value).length) return;
@@ -56,26 +75,18 @@ const goToDetailPage = () => {
   newsDetailInfo.value = {};
 };
 
-const handleTabs = ({ paneKey }) => updateList(paneKey);
-
-const refreshLoadMore = (done: () => void) => {};
-
-const refresh = (done: () => void) => {};
-const init = () => {};
-
-const handleScroll = ({ detail }) => {
-  isFixedInput.value = detail.scrollTop >= 198;
-};
-
 onMounted(() => {
   initData();
 });
+
 watchEffect(() => {
   goToDetailPage();
 });
 </script>
 
 <template>
+  <reload-button v-show="isFixedInput" />
+
   <my-container :scroll-y="true" @scroll="handleScroll">
     <nut-row>
       <nut-col :span="24" class="home-top">
@@ -83,7 +94,7 @@ watchEffect(() => {
       </nut-col>
 
       <nut-col :span="24" class="home-bottom">
-        <home-result :loading="loading" :error="error" @on-button-click="loadList" />
+        <home-result :loading="loading" :error="error" @on-button-click="updateList" />
 
         <nut-tabs
           v-if="tabTitle.length && !loading && !error"
@@ -97,41 +108,43 @@ watchEffect(() => {
             v-for="item in tabTitle"
             :title="item.title"
             :pane-key="item.key"
-            style="padding: 0; background: #fcfcfc"
+            id="refreshScroll"
+            class="home-bottom-content"
           >
-            <nut-cell v-show="tabChannel === 'HOTSPOT'" style="flex-direction: column">
-              <nut-row
-                style="margin: 5px 0"
-                v-for="item in newsList[tabChannel].result"
-                :key="item.title"
-                @click="() => (newsDetailInfo = item)"
+            <nut-infiniteloading
+              pull-icon="more-x"
+              container-id="refreshScroll"
+              :use-window="false"
+              :has-more="refreshHasMore"
+              @load-more="refreshLoadMore"
+            >
+              <nut-cell
+                v-show="newsList[HOTSPOT].result.length && isGetNews()"
+                style="flex-direction: column"
               >
-                <nut-col :span="3">
-                  <nut-tag style="height: 16px" type="danger">置顶</nut-tag>
-                </nut-col>
-                <nut-col :span="21">
-                  <span class="home-bottom-hot-title">{{ item.title }}</span>
-                </nut-col>
-              </nut-row>
-            </nut-cell>
+                <nut-row
+                  v-for="item in newsList[HOTSPOT].result"
+                  :key="item.title"
+                  @click="() => (newsDetailInfo = item)"
+                  style="margin: 6px 0"
+                >
+                  <nut-col :span="3">
+                    <nut-tag style="height: 16px" type="danger">置顶</nut-tag>
+                  </nut-col>
+                  <nut-col :span="21">
+                    <span class="home-bottom-hot-title">{{ item.title }}</span>
+                  </nut-col>
+                </nut-row>
+              </nut-cell>
+
+              <nut-cell-group>
+                <nut-cell v-for="i in 30" :key="i">
+                  {{ i }}
+                </nut-cell>
+              </nut-cell-group>
+            </nut-infiniteloading>
           </nut-tabpane>
         </nut-tabs>
-
-        <ul id="refreshScroll" style="height: 700px">
-          <nut-infiniteloading
-            pull-icon="more-x"
-            container-id="refreshScroll"
-            :use-window="false"
-            :is-open-refresh="true"
-            :has-more="refreshHasMore"
-            @load-more="refreshLoadMore"
-            @refresh="refresh"
-          >
-            <li v-for="i in 5" :key="i">
-              {{ i }}
-            </li>
-          </nut-infiniteloading>
-        </ul>
       </nut-col>
     </nut-row>
   </my-container>
@@ -155,6 +168,11 @@ watchEffect(() => {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+    }
+    &-content {
+      height: calc(100vh - 142px);
+      padding: 0;
+      background: #fcfcfc;
     }
   }
 }

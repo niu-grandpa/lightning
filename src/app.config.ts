@@ -11,4 +11,7 @@ export default defineAppConfig({
     navigationBarTextStyle: 'black',
   },
   lazyCodeLoading: 'requiredComponents',
+  enableShareAppMessage: true,
+  enableShareTimeline: true,
+  entryPagePath: index[0],
 });
