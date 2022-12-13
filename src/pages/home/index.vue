@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, watchEffect } from 'vue';
+import { ref, onMounted, reactive, watchEffect, computed } from 'vue';
 import { HomeSearchView, HomeResult, MyContainer, ReloadButton } from '../../components';
 import { useGetNewsList } from '../../assets/hooks';
 import { NewsCategory, type NewsListResult } from '../../assets/https';
@@ -14,16 +14,21 @@ type NewsListType = {
 
 const HOTSPOT = 'HOTSPOT';
 
+const collectIndexMap = reactive<NewsListType>({});
+
+const hotspotList = computed(() => collectIndexMap[HOTSPOT]);
+const otherList = computed(() => collectIndexMap[tabChannel.value]);
+
 const error = ref(false);
 const loading = ref(true);
 const isFixedInput = ref(false);
 const refreshHasMore = ref(true);
 const tabTitle = ref<{ title: string; key: string }[]>([]);
 const tabChannel = ref('NEWS');
-const newsList = reactive<NewsListType>({});
 const newsDetailInfo = ref<NewsListResult | {}>({});
 
-const isGetNews = () => tabChannel.value === 'NEWS';
+const isNewsChannel = () => tabChannel.value === 'NEWS';
+
 const handleTabs = ({ paneKey }) => updateList(paneKey);
 const handleScroll = ({ detail }) => (isFixedInput.value = detail.scrollTop >= 198);
 
@@ -33,7 +38,7 @@ const initData = () => {
     if (title !== NewsCategory[HOTSPOT]) {
       tabTitle.value.push({ title: title === '新闻' ? '推荐' : title, key });
     }
-    newsList[key] = { start: -1, result: [] };
+    collectIndexMap[key] = { start: -1, result: [] };
   });
   updateList();
 };
@@ -41,28 +46,36 @@ const initData = () => {
 const updateList = (channel?: string) => {
   tabChannel.value = channel || tabChannel.value;
 
-  let { start } = newsList[tabChannel.value];
+  let { start } = otherList.value;
   start++;
 
-  newsList[tabChannel.value].start = start;
   // 当获取新闻频道数据的同时获取"头条"数据
-  if (isGetNews()) {
-    newsList[HOTSPOT].start = start;
-    loadList({ channel: NewsCategory[HOTSPOT], start, num: 5 });
+  if (isNewsChannel()) {
+    hotspotList.value.start = start;
+    const hotspot = useGetNewsList(
+      res => requsetCallback(res, HOTSPOT),
+      () => (error.value = true)
+    );
+    hotspotList.value.result = hotspot({ channel: NewsCategory[HOTSPOT], start, num: 5 });
   }
 
-  loadList({ channel: NewsCategory[tabChannel.value], start, num: 5 });
+  otherList.value.start = start;
+  otherList.value.result = loadList({
+    channel: NewsCategory[tabChannel.value],
+    start,
+    num: 5,
+  });
 };
 
-const loadList = useGetNewsList(
-  ({ list, success }) => {
-    error.value = !success;
-    loading.value = !success;
-    newsList[tabChannel.value].result = list;
-    isGetNews() && (newsList[HOTSPOT].result = list);
-  },
-  () => (error.value = true)
-);
+const requsetCallback = ({ list, success }, channel = tabChannel.value) => {
+  error.value = !success;
+  loading.value = !success;
+  console.log('[useGetNewsList] 新闻频道: ', tabChannel.value);
+  collectIndexMap[channel].result = list;
+  console.log('[useGetNewsList] 新闻索引表: \t', collectIndexMap);
+};
+
+const loadList = useGetNewsList(requsetCallback, () => (error.value = true));
 
 const refreshLoadMore = (done: () => void) => {};
 
@@ -118,28 +131,33 @@ watchEffect(() => {
               :has-more="refreshHasMore"
               @load-more="refreshLoadMore"
             >
-              <nut-cell
-                v-show="newsList[HOTSPOT].result.length && isGetNews()"
-                style="flex-direction: column"
+              <!-- 头条新闻 -->
+              <nut-skeleton
+                width="250px"
+                height="15px"
+                row="4"
+                :loading="!hotspotList.result.length && !isNewsChannel()"
               >
-                <nut-row
-                  v-for="item in newsList[HOTSPOT].result"
-                  :key="item.title"
-                  @click="() => (newsDetailInfo = item)"
-                  style="margin: 6px 0"
-                >
-                  <nut-col :span="3">
-                    <nut-tag style="height: 16px" type="danger">置顶</nut-tag>
-                  </nut-col>
-                  <nut-col :span="21">
-                    <span class="home-bottom-hot-title">{{ item.title }}</span>
-                  </nut-col>
-                </nut-row>
-              </nut-cell>
-
+                <nut-cell style="flex-direction: column">
+                  <nut-row
+                    v-for="item in hotspotList.result"
+                    :key="item.title"
+                    @click="() => (newsDetailInfo = item)"
+                    style="margin: 6px 0"
+                  >
+                    <nut-col :span="3">
+                      <nut-tag style="height: 16px" type="danger">置顶</nut-tag>
+                    </nut-col>
+                    <nut-col :span="21">
+                      <span class="home-bottom-hot-title">{{ item.title }}</span>
+                    </nut-col>
+                  </nut-row>
+                </nut-cell>
+              </nut-skeleton>
+              <!-- 其他新闻 -->
               <nut-cell-group>
-                <nut-cell v-for="i in 30" :key="i">
-                  {{ i }}
+                <nut-cell v-for="item in collectIndexMap[tabChannel].result" :key="item.title">
+                  {{ item.title }}
                 </nut-cell>
               </nut-cell-group>
             </nut-infiniteloading>

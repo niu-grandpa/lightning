@@ -107,7 +107,7 @@ export function useSearchEngine(type: EngineApi, word: string) {
 export const useGetNewsList = (
   callback: (res: UseGetNewsListReturnType) => void,
   failed?: () => void
-): ((data: GetNewsParams) => void) => {
+): ((data: GetNewsParams) => NewsListResult[]) => {
   const success = ref(false);
   const list = ref<NewsListResult[]>([]);
 
@@ -130,7 +130,10 @@ export const useGetNewsList = (
     }
   };
 
-  const onReload = (data: GetNewsParams) => request(data);
+  const onReload = (data: GetNewsParams) => {
+    request(data);
+    return result.value.list;
+  };
 
   watchEffect(() => {
     success.value && callback(result.value);
