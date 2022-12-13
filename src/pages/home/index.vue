@@ -90,7 +90,6 @@ onMounted(() => {
 
 <template>
   <reload-button v-show="isFixedInput" @click="() => updateNewsList()" />
-
   <home-container :scroll-y="true" @scroll="handleScroll">
     <nut-row>
       <!-- 搜索框 -->
@@ -143,6 +142,7 @@ onMounted(() => {
                 v-for="data in collectIndexMap[tabChannel].result"
                 :key="data.title"
                 @click="() => goToDetailPage(data)"
+                style="flex-wrap: wrap"
               >
                 <news-card :title="data.title" :src-name="data.src" :icon="data.pic" />
               </nut-cell>
@@ -174,7 +174,6 @@ onMounted(() => {
       text-overflow: ellipsis;
     }
     &-content {
-      // height: calc(100vh - 142px);
       padding: 0;
       background: #fcfcfc;
       .nut-cell-group {

@@ -19,25 +19,36 @@ defineProps<{ fixed?: boolean }>();
 
 const visible = ref(false);
 const searchValue = ref('');
+const isRespond = ref(false);
 const searchList = ref<string[]>([]);
 const engineIdx = ref(0);
 
+const setIsRespond = (v: boolean) => (isRespond.value = v);
+const clearList = () => searchList.value.length && (searchList.value.length = 0);
+
 const initData = () => {
   if (visible.value) return;
+  clearList();
   engineIdx.value = 0;
   searchValue.value = '';
-  searchList.value.length = 0;
+  setIsRespond(false);
 };
 
-const handleSearch = async () => {
+const handleSearch = () => {
   initData();
   if (!searchValue.value) {
-    searchList.value.length = 0;
+    clearList();
+    setIsRespond(false);
     return;
   }
+  requset().then(() => setIsRespond(false));
+};
+
+const requset = async () => {
+  setIsRespond(true);
   const searchApi = engineObj.methods[engineIdx.value];
   const data = await searchApi(searchValue.value);
-  searchList.value.length && (searchList.value.length = 0);
+  clearList();
   searchList.value.push(...data);
 };
 
@@ -100,7 +111,7 @@ const handleScan = () => {
       input-background="#efefef"
       style="padding: 95px 14px 0"
       placeholder="搜索或输入网址"
-      @search="handleSearch"
+      @search="() => handleToWebView(searchValue, engineIdx)"
     >
       <template #leftout>
         <nut-icon name="left" size="20" @click="visible = false" />
@@ -122,7 +133,7 @@ const handleScan = () => {
         style="margin-top: 25px; margin-left: 25px"
         animated
         row="3"
-        :loading="searchValue !== '' && !searchList.length"
+        :loading="isRespond"
       >
         <nut-cell-group>
           <nut-cell
