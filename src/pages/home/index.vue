@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, watchEffect, computed } from 'vue';
-import { HomeSearchView, HomeResult, MyContainer, ReloadButton } from '../../components';
+import Taro from '@tarojs/taro';
+import { ref, onMounted, reactive, computed } from 'vue';
+import { HomeSearchbar, HomeResult, HomeContainer, ReloadButton } from '../../components';
+import NewsCard from './components/news-card.vue';
 import { useGetNewsList } from '../../assets/hooks';
 import { NewsCategory, type NewsListResult } from '../../assets/https';
-import Taro from '@tarojs/taro';
 
 type NewsListType = {
   [x: string]: {
@@ -22,14 +23,12 @@ const otherList = computed(() => collectIndexMap[tabChannel.value]);
 const error = ref(false);
 const loading = ref(true);
 const isFixedInput = ref(false);
-const refreshHasMore = ref(true);
 const tabTitle = ref<{ title: string; key: string }[]>([]);
 const tabChannel = ref('NEWS');
-const newsDetailInfo = ref<NewsListResult | {}>({});
 
 const isNewsChannel = () => tabChannel.value === 'NEWS';
 
-const handleTabs = ({ paneKey }) => updateList(paneKey);
+const handleTabs = ({ paneKey }) => updateNewsList(paneKey);
 const handleScroll = ({ detail }) => (isFixedInput.value = detail.scrollTop >= 198);
 
 const initData = () => {
@@ -40,11 +39,11 @@ const initData = () => {
     }
     collectIndexMap[key] = { start: -1, result: [] };
   });
-  updateList();
+  updateNewsList();
 };
 
-const updateList = (channel?: string) => {
-  tabChannel.value = channel || tabChannel.value;
+const updateNewsList = (channel = tabChannel.value) => {
+  tabChannel.value = channel;
 
   let { start } = otherList.value;
   start++;
@@ -60,7 +59,7 @@ const updateList = (channel?: string) => {
   }
 
   otherList.value.start = start;
-  otherList.value.result = loadList({
+  otherList.value.result = loadNewsList({
     channel: NewsCategory[tabChannel.value],
     start,
     num: 5,
@@ -70,45 +69,37 @@ const updateList = (channel?: string) => {
 const requsetCallback = ({ list, success }, channel = tabChannel.value) => {
   error.value = !success;
   loading.value = !success;
-  console.log('[useGetNewsList] 新闻频道: ', tabChannel.value);
   collectIndexMap[channel].result = list;
-  console.log('[useGetNewsList] 新闻索引表: \t', collectIndexMap);
+  console.log('[useGetNewsList] 新闻频道: ', channel, '\n新闻索引表: ', collectIndexMap);
 };
 
-const loadList = useGetNewsList(requsetCallback, () => (error.value = true));
+const loadNewsList = useGetNewsList(requsetCallback, () => (error.value = true));
 
-const refreshLoadMore = (done: () => void) => {};
-
-const goToDetailPage = () => {
-  if (!Object.keys(newsDetailInfo.value).length) return;
-  Taro.preload({ info: newsDetailInfo.value });
+const goToDetailPage = (data: NewsListResult) => {
+  if (!Object.keys(data).length) return;
+  Taro.preload({ info: data });
   Taro.navigateTo({
     url: '../out/news-detail',
   });
-  newsDetailInfo.value = {};
 };
 
 onMounted(() => {
   initData();
 });
-
-watchEffect(() => {
-  goToDetailPage();
-});
 </script>
 
 <template>
-  <reload-button v-show="isFixedInput" />
+  <reload-button v-show="isFixedInput" @click="() => updateNewsList()" />
 
-  <my-container :scroll-y="true" @scroll="handleScroll">
+  <home-container :scroll-y="true" @scroll="handleScroll">
     <nut-row>
+      <!-- 搜索框 -->
       <nut-col :span="24" class="home-top">
-        <home-search-view :fixed="isFixedInput" />
+        <home-searchbar :fixed="isFixedInput" />
       </nut-col>
-
+      <!-- 新闻tab页面 -->
       <nut-col :span="24" class="home-bottom">
-        <home-result :loading="loading" :error="error" @on-button-click="updateList" />
-
+        <home-result :loading="loading" :error="error" @on-button-click="updateNewsList" />
         <nut-tabs
           v-if="tabTitle.length && !loading && !error"
           v-model="tabChannel"
@@ -118,54 +109,49 @@ watchEffect(() => {
           @click="handleTabs"
         >
           <nut-tabpane
-            v-for="item in tabTitle"
-            :title="item.title"
-            :pane-key="item.key"
-            id="refreshScroll"
+            v-for="titles in tabTitle"
+            :title="titles.title"
+            :pane-key="titles.key"
             class="home-bottom-content"
           >
-            <nut-infiniteloading
-              pull-icon="more-x"
-              container-id="refreshScroll"
-              :use-window="false"
-              :has-more="refreshHasMore"
-              @load-more="refreshLoadMore"
-            >
-              <!-- 头条新闻 -->
+            <!-- 头条新闻 -->
+            <nut-cell v-if="isNewsChannel()" style="flex-direction: column">
               <nut-skeleton
-                width="250px"
+                :loading="!hotspotList.result.length"
+                row="5"
+                width="300px"
                 height="15px"
-                row="4"
-                :loading="!hotspotList.result.length && !isNewsChannel()"
               >
-                <nut-cell style="flex-direction: column">
-                  <nut-row
-                    v-for="item in hotspotList.result"
-                    :key="item.title"
-                    @click="() => (newsDetailInfo = item)"
-                    style="margin: 6px 0"
-                  >
-                    <nut-col :span="3">
-                      <nut-tag style="height: 16px" type="danger">置顶</nut-tag>
-                    </nut-col>
-                    <nut-col :span="21">
-                      <span class="home-bottom-hot-title">{{ item.title }}</span>
-                    </nut-col>
-                  </nut-row>
-                </nut-cell>
+                <nut-row
+                  v-for="hot in hotspotList.result"
+                  :key="hot.content"
+                  @click="() => goToDetailPage(hot)"
+                  style="margin: 6px 0"
+                >
+                  <nut-col :span="3">
+                    <nut-tag style="height: 16px" type="danger">置顶</nut-tag>
+                  </nut-col>
+                  <nut-col :span="21">
+                    <span class="home-bottom-hot-title">{{ hot.title }}</span>
+                  </nut-col>
+                </nut-row>
               </nut-skeleton>
-              <!-- 其他新闻 -->
-              <nut-cell-group>
-                <nut-cell v-for="item in collectIndexMap[tabChannel].result" :key="item.title">
-                  {{ item.title }}
-                </nut-cell>
-              </nut-cell-group>
-            </nut-infiniteloading>
+            </nut-cell>
+            <!-- 其他新闻 -->
+            <nut-cell-group>
+              <nut-cell
+                v-for="data in collectIndexMap[tabChannel].result"
+                :key="data.title"
+                @click="() => goToDetailPage(data)"
+              >
+                <news-card :title="data.title" :src-name="data.src" :icon="data.pic" />
+              </nut-cell>
+            </nut-cell-group>
           </nut-tabpane>
         </nut-tabs>
       </nut-col>
     </nut-row>
-  </my-container>
+  </home-container>
 </template>
 
 <style lang="less">
@@ -188,9 +174,12 @@ watchEffect(() => {
       text-overflow: ellipsis;
     }
     &-content {
-      height: calc(100vh - 142px);
+      // height: calc(100vh - 142px);
       padding: 0;
       background: #fcfcfc;
+      .nut-cell-group {
+        box-shadow: 0px 1px 7px 0px rgb(237, 238, 241);
+      }
     }
   }
 }

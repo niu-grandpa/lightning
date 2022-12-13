@@ -20,13 +20,13 @@ import {
   Col,
   Empty,
   Tag,
-  InfiniteLoading,
   Tabs,
   TabPane,
   Sticky,
   BackTop,
   Grid,
   GridItem,
+  Ellipsis,
 } from '@nutui/nutui-taro';
 
 export default (app: App) => {
@@ -50,13 +50,13 @@ export default (app: App) => {
     Col,
     Empty,
     Tag,
-    InfiniteLoading,
     Tabs,
     TabPane,
     Sticky,
     BackTop,
     Grid,
     GridItem,
+    Ellipsis,
   ];
   usePlugins(app, plugins);
 };

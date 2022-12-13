@@ -1,6 +1,6 @@
-import HomeSearchView from './home-search-view.vue';
-import MyContainer from './page-container.vue';
+import HomeSearchbar from './home-searchbar.vue';
+import HomeContainer from './home-container.vue';
 import HomeResult from './home-result.vue';
 import ReloadButton from './reload-button.vue';
 
-export { HomeSearchView, MyContainer, HomeResult, ReloadButton };
+export { HomeSearchbar, HomeContainer, HomeResult, ReloadButton };

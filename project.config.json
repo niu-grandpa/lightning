@@ -4,7 +4,7 @@
     "description": "这是一个基于微信小程序开发的浏览器 —— 闪电⚡浏览器",
     "appid": "wx316677600bdde439",
     "setting": {
-        "urlCheck": true,
+        "urlCheck": false,
         "es6": false,
         "enhance": false,
         "compileHotReLoad": false,

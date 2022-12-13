@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, nextTick, onBeforeUnmount, onBeforeMount, shallowRef } from 'vue';
 import TabbarItem, { type TabbarItemObj } from '../../assets/tabbar-item';
-import { MyContainer } from '../../components';
 import background from '../../../public/index.png';
 
 let timer: NodeJS.Timeout;
@@ -33,9 +32,9 @@ nextTick(() => {
     </section>
   </nut-popup>
 
-  <my-container v-if="!showIndexImage">
+  <template v-if="!showIndexImage">
     <Suspense><component :is="asyncComps[currentTab]" /></Suspense>
-  </my-container>
+  </template>
 
   <nut-tabbar v-model:visible="currentTab" bottom safeAreaInsetBottom active-color="#1989fa">
     <nut-tabbar-item

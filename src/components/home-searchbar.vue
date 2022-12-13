@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Taro from '@tarojs/taro';
 import { ref, watchEffect } from 'vue';
-import { MyContainer } from '.';
+import { HomeContainer } from '.';
 import { engineIcons } from '../assets/icons';
 import {
   getSMSearchKeywords,
@@ -115,7 +115,7 @@ const handleScan = () => {
       </template>
     </nut-searchbar>
 
-    <my-container class="home-search-view">
+    <home-container class="home-search-view">
       <nut-skeleton
         width="320px"
         height="18px"
@@ -149,7 +149,7 @@ const handleScan = () => {
           <img width="20px" height="20px" style="margin-right: 6px" :src="engineIcons[1]" />
         </template>
       </nut-cell>
-    </my-container>
+    </home-container>
   </nut-popup>
 </template>
 
