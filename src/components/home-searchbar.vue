@@ -166,6 +166,9 @@ const handleScan = () => {
 
 <style lang="less">
 .home-search {
+  height: 50px;
+  display: flex;
+  align-items: center;
   border: 2px solid #d3d3d3;
   border-radius: 40px;
   transition: all 0.2s;

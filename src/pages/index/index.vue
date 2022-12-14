@@ -26,9 +26,15 @@ nextTick(() => {
 </script>
 
 <template>
-  <nut-popup duration="2" :overlay="false" position="bottom" v-model:visible="showIndexImage">
+  <nut-popup
+    v-if="showIndexImage"
+    duration="2"
+    :overlay="false"
+    position="bottom"
+    v-model:visible="showIndexImage"
+  >
     <section class="index-background">
-      <img class="index-background-img" :src="background" alt="background-image" />
+      <image class="index-background-img" :src="background" />
     </section>
   </nut-popup>
 
@@ -55,7 +61,6 @@ nextTick(() => {
     &-img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
     }
   }
 }
