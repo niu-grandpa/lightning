@@ -15,7 +15,10 @@ const props = defineProps<{
       <image :lazyLoad="true" class="news-card-icon" :src="props.icon" />
     </nut-col>
   </nut-row>
-  <p class="news-card-src">{{ props.srcName }}</p>
+  <div class="news-card-extra">
+    <p>{{ props.srcName }}</p>
+    <nut-icon name="close" size="8" />
+  </div>
 </template>
 
 <style lang="less">
@@ -35,7 +38,11 @@ const props = defineProps<{
     border-radius: 3px;
     object-fit: cover;
   }
-  &-src {
+  &-extra {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
     font-size: 10px;
     color: rgb(148, 148, 148);
   }

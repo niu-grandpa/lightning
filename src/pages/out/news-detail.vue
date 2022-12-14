@@ -2,13 +2,14 @@
 import Taro from '@tarojs/taro';
 import { ref } from 'vue';
 import { type NewsListResult } from '../../assets/https';
+import { NewsComment } from '../../components';
 
 const { info } = Taro.getCurrentInstance().preloadData! as Record<string, NewsListResult>;
 const like = ref(Math.round(Math.random() * 999));
 </script>
 
 <template>
-  <nut-backtop>
+  <nut-backtop :bottom="120">
     <template #content>
       <main class="detail">
         <h1 class="detail-title">{{ info.title }}</h1>
@@ -40,6 +41,8 @@ const like = ref(Math.round(Math.random() * 999));
           </nut-grid-item>
           <nut-grid-item icon="fabulous" :text="`${like}`" />
         </nut-grid>
+
+        <news-comment />
       </main>
     </template>
   </nut-backtop>
