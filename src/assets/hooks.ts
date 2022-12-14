@@ -121,8 +121,7 @@ export const useGetNewsList = (
     try {
       const { result } = await getNewsList(data);
       success.value = true;
-      list.value.length && (list.value.length = 0);
-      list.value.push(...result.list);
+      list.value = result.list;
     } catch (error) {
       failed?.();
       Taro.showToast({ title: '网络似乎开小差了~', icon: 'none' });
@@ -132,7 +131,6 @@ export const useGetNewsList = (
 
   const onReload = (data: GetNewsParams) => {
     request(data);
-    return result.value.list;
   };
 
   watchEffect(() => {

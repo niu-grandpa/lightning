@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Taro from '@tarojs/taro';
 import { computed, onMounted, ref } from 'vue';
 
 const content = ref('');
@@ -25,6 +26,7 @@ const randomComment = () => {
     '为何要那么重点讲解第三种方法呢？',
     '码头陈如果没事，国足可以解散了s',
     '招聘前端开发工程师',
+    '2022卡塔尔世界杯 C罗落幕了😭',
     '计算机相关专业本科以上，5 年以上前端开发经验，电商相关经验优先。',
   ];
 
@@ -35,8 +37,9 @@ const randomComment = () => {
 };
 
 const handleSubmit = () => {
+  Taro.showToast({ title: '发表成功' });
+  comment.value.push(content.value);
   content.value = '';
-  comment.value.unshift(content.value);
 };
 
 onMounted(() => {
@@ -86,7 +89,7 @@ onMounted(() => {
 
 <style lang="less">
 .news-comment {
-  padding: 14px;
+  padding: 5px;
   &-title {
     margin-bottom: 24px;
     text-align: center;

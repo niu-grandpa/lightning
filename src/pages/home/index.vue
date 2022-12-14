@@ -23,13 +23,23 @@ const otherList = computed(() => collectIndexMap[tabChannel.value]);
 const error = ref(false);
 const loading = ref(true);
 const isFixedInput = ref(false);
+
 const tabTitle = ref<{ title: string; key: string }[]>([]);
 const tabChannel = ref('NEWS');
+const updateAction = ref<'push' | 'clear'>('clear');
 
 const isNewsChannel = () => tabChannel.value === 'NEWS';
 
-const handleTabs = ({ paneKey }) => updateNewsList(paneKey);
-const handleScroll = ({ detail }) => (isFixedInput.value = detail.scrollTop >= 198);
+const handleTabs = ({ paneKey }) => {
+  updateAction.value = 'clear';
+  updateNewsList(paneKey);
+};
+const handleScroll = ({ detail }) => (isFixedInput.value = detail.scrollTop >= 180);
+
+const handleReload = () => {
+  updateAction.value = 'push';
+  updateNewsList(tabChannel.value);
+};
 
 const initData = () => {
   Object.keys(NewsCategory).forEach(key => {
@@ -37,16 +47,23 @@ const initData = () => {
     if (title !== NewsCategory[HOTSPOT]) {
       tabTitle.value.push({ title: title === '新闻' ? '推荐' : title, key });
     }
-    collectIndexMap[key] = { start: -1, result: [] };
+    collectIndexMap[key] = { start: -5, result: [] };
   });
   updateNewsList();
 };
 
 const updateNewsList = (channel = tabChannel.value) => {
+  const loadList = useGetNewsList(
+    res => requsetCallback(res, channel),
+    () => (error.value = true)
+  );
+
   tabChannel.value = channel;
 
+  let num = 5;
   let { start } = otherList.value;
-  start++;
+
+  start += num;
 
   // 当获取新闻频道数据的同时获取"头条"数据
   if (isNewsChannel()) {
@@ -55,25 +72,31 @@ const updateNewsList = (channel = tabChannel.value) => {
       res => requsetCallback(res, HOTSPOT),
       () => (error.value = true)
     );
-    hotspotList.value.result = hotspot({ channel: NewsCategory[HOTSPOT], start, num: 5 });
+    hotspot({ channel: NewsCategory[HOTSPOT], start, num });
   }
-
   otherList.value.start = start;
-  otherList.value.result = loadNewsList({
-    channel: NewsCategory[tabChannel.value],
+
+  loadList({
+    channel: NewsCategory[channel],
     start,
     num: 5,
   });
 };
 
 const requsetCallback = ({ list, success }, channel = tabChannel.value) => {
+  if (updateAction.value === 'push' && channel !== HOTSPOT) {
+    (list as NewsListResult[]).forEach(item => {
+      if (otherList.value.result.includes(item)) return;
+      otherList.value.result.push(item);
+    });
+  } else if (channel === HOTSPOT || updateAction.value === 'clear') {
+    collectIndexMap[channel].result = list;
+  }
   error.value = !success;
   loading.value = !success;
-  collectIndexMap[channel].result = list;
+
   console.log('[useGetNewsList] 新闻频道: ', channel, '\n新闻索引表: ', collectIndexMap);
 };
-
-const loadNewsList = useGetNewsList(requsetCallback, () => (error.value = true));
 
 const goToDetailPage = (data: NewsListResult) => {
   if (!Object.keys(data).length) return;
@@ -89,7 +112,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <reload-button v-show="isFixedInput" @click="() => updateNewsList()" />
+  <reload-button v-show="isFixedInput" @click="handleReload" />
   <home-container :scroll-y="true" @scroll="handleScroll">
     <nut-row>
       <!-- 搜索框 -->
@@ -115,12 +138,7 @@ onMounted(() => {
           >
             <!-- 头条新闻 -->
             <nut-cell v-if="isNewsChannel()" style="flex-direction: column">
-              <nut-skeleton
-                :loading="!hotspotList.result.length"
-                row="5"
-                width="300px"
-                height="15px"
-              >
+              <nut-skeleton :loading="false" row="5" width="300px" height="15px">
                 <nut-row
                   v-for="hot in hotspotList.result"
                   :key="hot.content"
@@ -139,7 +157,7 @@ onMounted(() => {
             <!-- 其他新闻 -->
             <nut-cell-group>
               <nut-cell
-                v-for="data in collectIndexMap[tabChannel].result"
+                v-for="data in otherList.result"
                 :key="data.title"
                 @click="() => goToDetailPage(data)"
                 style="flex-wrap: wrap"

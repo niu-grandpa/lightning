@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, nextTick, onBeforeUnmount, onBeforeMount, shallowRef } from 'vue';
 import TabbarItem, { type TabbarItemObj } from '../../assets/tabbar-item';
-import background from '../../../public/index.png';
+import { HomeLogo } from '../../components';
 
 let timer: NodeJS.Timeout;
 
@@ -15,14 +15,14 @@ onBeforeMount(() => {
   });
 });
 
-onBeforeUnmount(() => clearTimeout(timer));
-
 nextTick(() => {
   showIndexImage.value = true;
   timer = setTimeout(() => {
     showIndexImage.value = false;
   }, 2000);
 });
+
+onBeforeUnmount(() => clearTimeout(timer));
 </script>
 
 <template>
@@ -33,8 +33,12 @@ nextTick(() => {
     position="bottom"
     v-model:visible="showIndexImage"
   >
-    <section class="index-background">
-      <image class="index-background-img" :src="background" />
+    <section class="index-welcome">
+      <figure class="index-welcome-figure">
+        <home-logo />
+        <h1 class="index-welcome-title">浏览器</h1>
+        <p class="index-welcome-desc">我如光速般穿梭</p>
+      </figure>
     </section>
   </nut-popup>
 
@@ -55,12 +59,21 @@ nextTick(() => {
 
 <style lang="less">
 .index {
-  &-background {
+  &-welcome {
     width: 100%;
     height: 100vh;
-    &-img {
-      width: 100%;
-      height: 100%;
+    &-figure {
+      margin-top: 50%;
+      text-align: center;
+    }
+    &-title {
+      margin-top: 8px;
+      margin-bottom: 4px;
+      font-size: 28px;
+    }
+    &-desc {
+      font-size: 12px;
+      color: #999999;
     }
   }
 }
