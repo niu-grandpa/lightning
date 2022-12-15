@@ -1,24 +1,32 @@
-<script lang="ts" setup>
+<script lang="tsx" setup>
+import { computed } from 'vue';
+
 const props = defineProps<{
   title: string;
   icon: string;
   srcName: string;
 }>();
+
+const NewsCard = computed(() => () => (
+  <>
+    <nut-row class='news-card'>
+      <nut-col span={16}>
+        <nut-ellipsis class='news-card-content' content={props.title} direction='end' rows='3' />
+      </nut-col>
+      <nut-col span={6}>
+        <image lazyLoad class='news-card-icon' src={props.icon} />
+      </nut-col>
+    </nut-row>
+    <div class='news-card-extra'>
+      <p>{props.srcName}</p>
+      <nut-icon name='close' size='8' />
+    </div>
+  </>
+));
 </script>
 
 <template>
-  <nut-row class="news-card">
-    <nut-col :span="16">
-      <nut-ellipsis class="news-card-content" :content="props.title" direction="end" rows="3" />
-    </nut-col>
-    <nut-col :span="6">
-      <image :lazyLoad="true" class="news-card-icon" :src="props.icon" />
-    </nut-col>
-  </nut-row>
-  <div class="news-card-extra">
-    <p>{{ props.srcName }}</p>
-    <nut-icon name="close" size="8" />
-  </div>
+  <NewsCard />
 </template>
 
 <style lang="less">

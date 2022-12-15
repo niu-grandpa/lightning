@@ -1,7 +1,15 @@
-<template>
-  <div class="reload-btn">
-    <nut-icon name="refresh2" />
+<script lang="tsx" setup>
+import { computed } from 'vue';
+
+const ReloadButton = computed(() => () => (
+  <div class='reload-btn'>
+    <nut-icon name='refresh2' />
   </div>
+));
+</script>
+
+<template>
+  <ReloadButton />
 </template>
 
 <style>

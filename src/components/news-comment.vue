@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import Taro from '@tarojs/taro';
 import { computed, onMounted, ref } from 'vue';
 
@@ -45,46 +45,56 @@ const handleSubmit = () => {
 onMounted(() => {
   randomComment();
 });
+
+const NewsComment = computed(() => () => (
+  <>
+    <section class='news-comment'>
+      <h3 class='news-comment-title'>全部评论</h3>
+      {!comment.value.length ? (
+        <nut-empty description='抢沙发，发首评，稳占C位!' />
+      ) : (
+        comment.value.map(item => (
+          <nut-row key={item} style={{ marginBottom: '30px' }}>
+            <nut-col span={3}>
+              <nut-avatar icon='my' shape='round' />
+            </nut-col>
+            <nut-col span={17} style={{ marginLeft: '14px' }}>
+              <p class='news-comment-name'>匿名用户</p>
+              <p>{{ item }}</p>
+            </nut-col>
+            <nut-col span={2}>
+              <nut-icon name='fabulous' style={{ marginLeft: '26px' }} />
+            </nut-col>
+          </nut-row>
+        ))
+      )}
+    </section>
+    <section class='news-comment-input'>
+      <nut-row>
+        <nut-col span={14}>
+          <nut-searchbar
+            vMmodel={content.value}
+            placeholder='我来说两句'
+            clearable={false}
+            inputBackground='#f6f7f9'
+            onSearch={handleSubmit}
+          />
+        </nut-col>
+        <nut-col span={10}>
+          <nut-grid columnNum={3} border={false} clickable iconSize='20'>
+            <nut-grid-item icon='message' />
+            <nut-grid-item icon='star' />
+            <nut-grid-item icon='share' />
+          </nut-grid>
+        </nut-col>
+      </nut-row>
+    </section>
+  </>
+));
 </script>
 
 <template>
-  <section class="news-comment">
-    <h3 class="news-comment-title">全部评论</h3>
-    <nut-empty v-if="!comment.length" description="抢沙发，发首评，稳占C位!" />
-    <nut-row v-else v-for="item in comment" :key="item" style="margin-bottom: 30px">
-      <nut-col :span="3">
-        <nut-avatar icon="my" shape="round" />
-      </nut-col>
-      <nut-col :span="17" style="margin-left: 14px">
-        <p class="news-comment-name">匿名用户</p>
-        <p>{{ item }}</p>
-      </nut-col>
-      <nut-col :span="2">
-        <nut-icon name="fabulous" style="margin-left: 26px" />
-      </nut-col>
-    </nut-row>
-  </section>
-
-  <section class="news-comment-input">
-    <nut-row>
-      <nut-col :span="14">
-        <nut-searchbar
-          v-model="content"
-          placeholder="我来说两句"
-          :clearable="false"
-          input-background="#f6f7f9"
-          @search="handleSubmit"
-        />
-      </nut-col>
-      <nut-col :span="10">
-        <nut-grid :column-num="3" :border="false" clickable icon-size="20">
-          <nut-grid-item icon="message" />
-          <nut-grid-item icon="star" />
-          <nut-grid-item icon="share" />
-        </nut-grid>
-      </nut-col>
-    </nut-row>
-  </section>
+  <NewsComment />
 </template>
 
 <style lang="less">

@@ -1,6 +1,6 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import Taro from '@tarojs/taro';
-import { ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { HomeContainer } from '.';
 import { engineIcons } from '../assets/icons';
 import {
@@ -15,7 +15,7 @@ const engineObj = {
   methods: [getSMSearchKeywords, getBaiduSearchKeywords, getBingSearchKeywords],
 };
 
-defineProps<{ fixed?: boolean }>();
+const props = defineProps<{ fixed?: boolean }>();
 
 const visible = ref(false);
 const searchValue = ref('');
@@ -79,89 +79,96 @@ const handleScan = () => {
     });
   });
 };
+
+const HomeSearchBar = computed(() => () => (
+  <>
+    <nut-input
+      readonly
+      clearable
+      border={false}
+      leftIcon={!props.fixed ? 'search2' : ''}
+      class={`home-search ${props.fixed ? 'home-search-fixed' : ''}`}
+      onClickInput={() => (visible.value = true)}
+      placeholder='搜索或输入网址'>
+      {{
+        button: () => (
+          <>
+            <nut-icon name='microphone' onClick={handleMicro} style={{ marginRight: '16px' }} />
+            <nut-icon name='scan2' onClick={handleScan} />
+          </>
+        ),
+      }}
+    </nut-input>
+
+    <nut-popup
+      visible={visible.value}
+      overlay={false}
+      position='right'
+      class='home-search-view'
+      style={{ width: '100%' }}>
+      <nut-searchbar
+        vModel={searchValue.value}
+        autofocus
+        inputBackground='#efefef'
+        style={{ padding: '95px 14px 0' }}
+        placeholder='搜索或输入网址'
+        onSearch={() => handleToWebView(searchValue.value, engineIdx.value)}>
+        {{
+          leftout: () => <nut-icon name='left' size='20' onClick={() => (visible.value = false)} />,
+          leftin: () =>
+            engineIdx.value === 1 ? (
+              <nut-icon name={engineIcons[1]} onClick={handleChangeEngine} />
+            ) : engineIdx.value === 2 ? (
+              <nut-icon name={engineIcons[2]} onClick={handleChangeEngine} />
+            ) : (
+              <nut-icon size='18' name={engineIcons[0]} onClick={handleChangeEngine} />
+            ),
+          rightin: () => <nut-icon name='microphone' onClick='handleMicro' />,
+        }}
+      </nut-searchbar>
+
+      <HomeContainer>
+        <nut-skeleton
+          width='320px'
+          height='18px'
+          style={{ marginTop: '25px', marginLeft: '25px' }}
+          animated
+          row='3'
+          loading={isRespond.value}>
+          <nut-cell-group>
+            {searchList.value.map(word => (
+              <nut-cell
+                title={word}
+                key={word}
+                is-link
+                onClick={() => handleToWebView(word, engineIdx.value)}>
+                {{
+                  icon: () => <nut-icon name='search2' style={{ marginRight: '8px' }} />,
+                }}
+              </nut-cell>
+            ))}
+          </nut-cell-group>
+        </nut-skeleton>
+
+        <nut-cell
+          vShow={searchValue.value}
+          title={`百度一下: ${searchValue.value}`}
+          isLink
+          onClick={() => handleToWebView(searchValue.value, 1)}>
+          {{
+            icon: () => (
+              <img width='20px' height='20px' style={{ marginRight: '6px' }} src={engineIcons[1]} />
+            ),
+          }}
+        </nut-cell>
+      </HomeContainer>
+    </nut-popup>
+  </>
+));
 </script>
 
 <template>
-  <nut-input
-    readonly
-    clearable
-    :border="false"
-    class="home-search"
-    :class="{ 'home-search-fixed': $props.fixed }"
-    :left-icon="!$props.fixed ? 'search2' : ''"
-    @click-input="visible = true"
-    placeholder="搜索或输入网址"
-  >
-    <template #button>
-      <nut-icon name="microphone" @click="handleMicro" style="margin-right: 16px" />
-      <nut-icon name="scan2" @click="handleScan" />
-    </template>
-  </nut-input>
-
-  <nut-popup
-    style="width: 100%"
-    :overlay="false"
-    v-model:visible="visible"
-    class="home-search-view"
-    position="right"
-  >
-    <nut-searchbar
-      v-model="searchValue"
-      autofocus
-      input-background="#efefef"
-      style="padding: 95px 14px 0"
-      placeholder="搜索或输入网址"
-      @search="() => handleToWebView(searchValue, engineIdx)"
-    >
-      <template #leftout>
-        <nut-icon name="left" size="20" @click="visible = false" />
-      </template>
-      <template #leftin>
-        <nut-icon v-if="engineIdx === 1" :name="engineIcons[1]" @click="handleChangeEngine" />
-        <nut-icon v-else-if="engineIdx === 2" :name="engineIcons[2]" @click="handleChangeEngine" />
-        <nut-icon v-else size="18" :name="engineIcons[0]" @click="handleChangeEngine" />
-      </template>
-      <template #rightin>
-        <nut-icon name="microphone" @click="handleMicro" />
-      </template>
-    </nut-searchbar>
-
-    <home-container class="home-search-view">
-      <nut-skeleton
-        width="320px"
-        height="18px"
-        style="margin-top: 25px; margin-left: 25px"
-        animated
-        row="3"
-        :loading="isRespond"
-      >
-        <nut-cell-group>
-          <nut-cell
-            v-for="word in searchList"
-            :title="word"
-            :key="word"
-            is-link
-            @click="() => handleToWebView(word, engineIdx)"
-          >
-            <template #icon>
-              <nut-icon name="search2" style="margin-right: 8px" />
-            </template>
-          </nut-cell>
-        </nut-cell-group>
-      </nut-skeleton>
-
-      <nut-cell
-        v-show="searchValue"
-        :title="`百度一下: ${searchValue}`"
-        is-link
-        @click="() => handleToWebView(searchValue, 1)"
-      >
-        <template #icon>
-          <img width="20px" height="20px" style="margin-right: 6px" :src="engineIcons[1]" />
-        </template>
-      </nut-cell>
-    </home-container>
-  </nut-popup>
+  <HomeSearchBar />
 </template>
 
 <style lang="less">
@@ -176,10 +183,7 @@ const handleScan = () => {
     border: none;
   }
   &-view {
-    position: fixed;
-    z-index: 9999;
     .nut-searchbar {
-      background: transparent;
       &__search-input {
         height: 43px;
         margin-right: 6px;
