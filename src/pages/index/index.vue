@@ -1,23 +1,17 @@
-<script setup lang="ts">
-import { ref, nextTick, onBeforeUnmount, onBeforeMount, computed } from 'vue';
-import TabbarItem, { type TabbarItemObj } from '../../assets/tabbar-item';
+<script setup lang="tsx">
+import { ref, nextTick, onBeforeUnmount, computed } from 'vue';
+import TabbarItem from '../../assets/tabbar-item';
 import { HomeLogo } from '../../components';
-
-type AsyncCompsType = { [x: string]: TabbarItemObj['component'] };
+import Home from '../home/index.vue';
+import Horizon from '../horizon/index.vue';
+import Novel from '../novel/index.vue';
+import Video from '../video/index.vue';
+import My from '../person/index.vue';
 
 let timer: NodeJS.Timeout;
 
-const asyncComps = computed<AsyncCompsType>(() => ({}));
-
 const showIndexImage = ref(false);
 const currentTab = ref('home');
-
-onBeforeMount(() => {
-  // 建立组件对象，tabs name 映射对应组件
-  TabbarItem.forEach(({ name, component }) => {
-    asyncComps.value[name] = component;
-  });
-});
 
 nextTick(() => {
   showIndexImage.value = true;
@@ -27,38 +21,43 @@ nextTick(() => {
 });
 
 onBeforeUnmount(() => clearTimeout(timer));
+
+const App = computed(() => () => (
+  <>
+    {/**海报页 */}
+    {showIndexImage.value && (
+      <nut-popup visible={showIndexImage.value} duration='2' overlay={false} position='bottom'>
+        <section class='index-welcome'>
+          <figure class='index-welcome-figure'>
+            <HomeLogo />
+            <h1 class='index-welcome-title'>浏览器</h1>
+            <p class='index-welcome-desc'>我如光速般穿梭</p>
+          </figure>
+        </section>
+      </nut-popup>
+    )}
+    {/**组件页面 */}
+    {
+      computed(() => [
+        currentTab.value === 'home' && <Home />,
+        currentTab.value === 'video' && <Video />,
+        currentTab.value === 'horizon' && <Horizon />,
+        currentTab.value === 'novel' && <Novel />,
+        currentTab.value === 'my' && <My />,
+      ]).value
+    }
+    {/**底部tab栏 */}
+    <nut-tabbar vModel:visible={currentTab.value} bottom safeAreaInsetBottom activeColor='#1989fa'>
+      {TabbarItem.map(({ text, name, icon }) => (
+        <nut-tabbar-item tabTitle={text} {...{ name, icon }} key={name} />
+      ))}
+    </nut-tabbar>
+  </>
+));
 </script>
 
 <template>
-  <nut-popup
-    v-if="showIndexImage"
-    duration="2"
-    :overlay="false"
-    position="bottom"
-    v-model:visible="showIndexImage"
-  >
-    <section class="index-welcome">
-      <figure class="index-welcome-figure">
-        <home-logo />
-        <h1 class="index-welcome-title">浏览器</h1>
-        <p class="index-welcome-desc">我如光速般穿梭</p>
-      </figure>
-    </section>
-  </nut-popup>
-
-  <template v-if="!showIndexImage">
-    <Suspense><component :is="asyncComps[currentTab]" /></Suspense>
-  </template>
-
-  <nut-tabbar v-model:visible="currentTab" bottom safeAreaInsetBottom active-color="#1989fa">
-    <nut-tabbar-item
-      v-for="item in TabbarItem"
-      :tab-title="item.text"
-      :name="item.name"
-      :icon="item.icon"
-      :key="item.name"
-    />
-  </nut-tabbar>
+  <App />
 </template>
 
 <style lang="less">

@@ -5,9 +5,11 @@ import { computed, watchEffect } from 'vue';
 const props = defineProps<{ loading: boolean; error: boolean }>();
 const emit = defineEmits<{ (event: 'on-button-click'): void }>();
 
+const nums = [1, 2, 3];
+
 watchEffect(() => {
   if (props.loading && !props.error) {
-    Taro.showLoading({ title: '更新数据中' });
+    Taro.showLoading({ title: '加载中...' });
   } else {
     Taro.hideLoading();
   }
@@ -15,6 +17,14 @@ watchEffect(() => {
 
 const HomeResult = computed(() => () => (
   <>
+    {props.loading &&
+      !props.error &&
+      nums.map(item => (
+        <section class='pic-compose' key={item}>
+          <nut-skeleton width='250px' height='15px' title animated row='5' class='item' />
+          <nut-skeleton width='250px' height='15px' title animated row='5' class='item' />
+        </section>
+      ))}
     {props.error && (
       <nut-empty image='network' description='网络连接失败'>
         <div style={{ marginTop: '10px' }}>
