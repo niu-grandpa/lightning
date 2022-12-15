@@ -1,10 +1,10 @@
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, DefineComponent } from 'vue';
 
 export type TabbarItemObj = {
   text: string;
   icon: string;
   name: string;
-  component: any;
+  component: DefineComponent;
 };
 
 export default <TabbarItemObj[]>[

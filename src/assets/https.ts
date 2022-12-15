@@ -53,8 +53,43 @@ export type NewsListResult = {
   weburl: string;
 };
 
-/**京东云接口appkey */
-const APPKEY = 'da39dce4f8aa52155677ed8cd23a6470';
+export type WeatherType = {
+  area: string;
+  tmp: string;
+  cond_txt: string;
+};
+
+type WeatherReturnType = {
+  now: {
+    cloud: string;
+    dew: string;
+    feelsLike: string;
+    humidity: string;
+    icon: string;
+    obsTime: string;
+    precip: string;
+    pressure: string;
+    temp: string;
+    text: string;
+    vis: string;
+    wind360: string;
+    windDir: string;
+    windScale: string;
+    windSpeed: string;
+  };
+};
+
+export type ShortVideosReturnType = {
+  code: number;
+  num: number;
+  bf_num: number;
+  sc_num: number;
+  url: string;
+};
+
+export type CommentReturnType = {
+  shenhuifu: string;
+};
 
 export const getSMSearchKeywords = async (word: string) => {
   const t = new Date().getTime();
@@ -102,11 +137,33 @@ export const getNewsList = async ({
   const { data } = await Taro.request<GetNewsReturnType>({
     url: 'https://way.jd.com/jisuapi/get',
     data: {
-      appkey: APPKEY,
+      appkey: 'da39dce4f8aa52155677ed8cd23a6470',
       channel,
       num,
       start,
     },
   });
   return data.result as unknown as GetNewsReturnType;
+};
+
+/**
+ * @param {string} location 经度在前纬度在后
+ */
+export const getWeather = async (location: string): Promise<WeatherReturnType> => {
+  const { data } = await Taro.request<WeatherReturnType>({
+    url: `https://devapi.qweather.com/v7/weather/now`,
+    data: {
+      key: 'a91212c50f7041b9a9c68ea15874dbcc',
+      location,
+    },
+  });
+  return data;
+};
+
+/** 快手随机播放短视频，数据来源于快手直链 */
+export const getHotVideos = async (): Promise<ShortVideosReturnType> => {
+  const { data } = await Taro.request<ShortVideosReturnType>({
+    url: `https://v.api.aa1.cn/api/ks/`,
+  });
+  return data;
 };

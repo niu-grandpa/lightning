@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ref, nextTick, onBeforeUnmount, onBeforeMount, shallowRef } from 'vue';
+import { ref, nextTick, onBeforeUnmount, onBeforeMount, computed } from 'vue';
 import TabbarItem, { type TabbarItemObj } from '../../assets/tabbar-item';
 import { HomeLogo } from '../../components';
 
+type AsyncCompsType = { [x: string]: TabbarItemObj['component'] };
+
 let timer: NodeJS.Timeout;
 
-const asyncComps = shallowRef<Record<string, TabbarItemObj['component']>>({});
+const asyncComps = computed<AsyncCompsType>(() => ({}));
+
 const showIndexImage = ref(false);
 const currentTab = ref('home');
 
 onBeforeMount(() => {
+  // 建立组件对象，tabs name 映射对应组件
   TabbarItem.forEach(({ name, component }) => {
     asyncComps.value[name] = component;
   });

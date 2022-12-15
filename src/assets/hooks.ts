@@ -1,6 +1,14 @@
 import Taro from '@tarojs/taro';
 import { computed, onMounted, ref, watchEffect, type App, type Plugin } from 'vue';
-import { type GetNewsParams, type NewsListResult, getNewsList } from './https';
+import {
+  type GetNewsParams,
+  type NewsListResult,
+  getNewsList,
+  getWeather,
+  getHotVideos,
+  ShortVideosReturnType,
+  WeatherType,
+} from './https';
 
 export type EngineApi = 'shenma' | 'baidu' | 'bing';
 
@@ -107,7 +115,7 @@ export function useSearchEngine(type: EngineApi, word: string) {
 export const useGetNewsList = (
   callback: (res: UseGetNewsListReturnType) => void,
   failed?: () => void
-): ((data: GetNewsParams) => NewsListResult[]) => {
+): ((data: GetNewsParams) => void) => {
   const success = ref(false);
   const list = ref<NewsListResult[]>([]);
 
@@ -138,4 +146,46 @@ export const useGetNewsList = (
   });
 
   return onReload;
+};
+
+/**
+ * useWeather
+ * @description 获取天气接口的数据
+ * @param callback 成功后的回调
+ */
+export const useWeather = (callback: (data: WeatherType) => any) => {
+  useRequstHook(async () => {
+    const { longitude, latitude } = await Taro.getLocation({ type: 'wgs84' });
+    const { now } = await getWeather(`${longitude},${latitude}`);
+    return { area: '当前城市', tmp: now.temp, cond_txt: now.text };
+  }, callback);
+};
+
+/**
+ * useHotVideos
+ * @description 获取快手随机短视频
+ * @param callback 成功后的回调
+ */
+export const useHotVideos = (callback: (data: ShortVideosReturnType) => any) => {
+  useRequstHook(async () => {
+    const data = await getHotVideos();
+    return data;
+  }, callback);
+};
+
+const useRequstHook = <T>(
+  requsetCb: () => Promise<T>,
+  success: (data: T) => any,
+  failed?: () => void
+) => {
+  const requset = async () => {
+    return await requsetCb();
+  };
+  onMounted(() => {
+    requset()
+      .then((res: T) => success(res))
+      .catch(() => {
+        failed?.();
+      });
+  });
 };

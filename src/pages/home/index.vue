@@ -3,6 +3,7 @@ import Taro from '@tarojs/taro';
 import { ref, onMounted, reactive, computed } from 'vue';
 import { HomeSearchbar, HomeResult, HomeContainer, ReloadButton } from '../../components';
 import NewsCard from './components/news-card.vue';
+import HomeWeather from './components/home-weather.vue';
 import { useGetNewsList } from '../../assets/hooks';
 import { NewsCategory, type NewsListResult } from '../../assets/https';
 
@@ -115,8 +116,10 @@ onMounted(() => {
   <reload-button v-show="isFixedInput" @click="handleReload" />
   <home-container :scroll-y="true" @scroll="handleScroll">
     <nut-row>
-      <!-- 搜索框 -->
+      <!-- 天气展示 -->
       <nut-col :span="24" class="home-top">
+        <home-weather />
+        <!-- 搜索框 -->
         <home-searchbar :fixed="isFixedInput" />
       </nut-col>
       <!-- 新闻tab页面 -->
@@ -175,12 +178,23 @@ onMounted(() => {
 <style lang="less">
 .home {
   &-top {
+    position: relative;
     height: 200px;
     padding-top: 28%;
     padding-left: 14px !important;
     padding-right: 14px !important;
     background-image: url(https://img.ixintu.com/download/jpg/202004/dc8c7c7e59b1c72c6bb4abdd17b92f15_800_399.jpg!con);
-    background-position: left;
+    &-weather {
+      position: absolute;
+      top: 24%;
+      font-size: 12px;
+      color: #333;
+      &-num {
+        margin-bottom: 4px;
+        font-size: 20px;
+        font-weight: bold;
+      }
+    }
   }
   &-bottom {
     padding: 14px !important;
