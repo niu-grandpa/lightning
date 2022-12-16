@@ -7,12 +7,15 @@ const emit = defineEmits<{ (event: 'on-button-click'): void }>();
 
 const nums = [1, 2, 3];
 
-watchEffect(() => {
-  if (props.loading && !props.error) {
-    Taro.showLoading({ title: '加载中...' });
-  } else {
-    Taro.hideLoading();
-  }
+watchEffect(onCleanup => {
+  const timer = setTimeout(() => {
+    if (props.loading && !props.error) {
+      Taro.showLoading({ title: '加载中...' });
+    } else {
+      Taro.hideLoading();
+    }
+    onCleanup(() => clearTimeout(timer));
+  }, 2000);
 });
 
 const HomeResult = computed(() => () => (

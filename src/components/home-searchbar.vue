@@ -80,8 +80,8 @@ const handleScan = () => {
   });
 };
 
-const HomeSearchBar = computed(() => () => (
-  <>
+const HomeSearchBar = computed(() => ({ className }: { className?: string }) => (
+  <section {...{ className }}>
     <nut-input
       readonly
       clearable
@@ -163,7 +163,7 @@ const HomeSearchBar = computed(() => () => (
         </nut-cell>
       </HomeContainer>
     </nut-popup>
-  </>
+  </section>
 ));
 </script>
 

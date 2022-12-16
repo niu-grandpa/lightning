@@ -166,11 +166,13 @@ export const useWeather = (callback: (data: WeatherType) => any) => {
  * @description 获取快手随机短视频
  * @param callback 成功后的回调
  */
-export const useHotVideos = (callback: (data: ShortVideosReturnType) => any) => {
-  useRequstHook(async () => {
-    const data = await getHotVideos();
-    return data;
-  }, callback);
+export const useHotVideos = (nums: number, callback: (data: ShortVideosReturnType) => any) => {
+  for (let i = 0; i < nums; i++) {
+    useRequstHook(async () => {
+      const data = await getHotVideos();
+      return data;
+    }, callback);
+  }
 };
 
 const useRequstHook = <T>(

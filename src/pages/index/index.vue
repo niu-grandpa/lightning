@@ -38,13 +38,16 @@ const App = computed(() => () => (
     )}
     {/**组件页面 */}
     {
-      computed(() => [
-        currentTab.value === 'home' && <Home />,
-        currentTab.value === 'video' && <Video />,
-        currentTab.value === 'horizon' && <Horizon />,
-        currentTab.value === 'novel' && <Novel />,
-        currentTab.value === 'my' && <My />,
-      ]).value
+      computed(
+        () =>
+          !showIndexImage.value && [
+            currentTab.value === 'home' && <My />,
+            currentTab.value === 'video' && <Video />,
+            currentTab.value === 'horizon' && <Horizon />,
+            currentTab.value === 'novel' && <Novel />,
+            currentTab.value === 'my' && <My />,
+          ]
+      ).value
     }
     {/**底部tab栏 */}
     <nut-tabbar vModel:visible={currentTab.value} bottom safeAreaInsetBottom activeColor='#1989fa'>

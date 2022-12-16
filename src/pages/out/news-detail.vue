@@ -2,7 +2,7 @@
 import Taro from '@tarojs/taro';
 import { ref, computed } from 'vue';
 import { type NewsListResult } from '../../assets/https';
-import { NewsComment } from '../../components';
+import { NewsComment, UserAvatar } from '../../components';
 
 const { info } = Taro.getCurrentInstance().preloadData! as Record<string, NewsListResult>;
 const like = ref(Math.round(Math.random() * 999));
@@ -13,15 +13,7 @@ const Component = computed(() => () => (
       content: () => (
         <main class='detail'>
           <h1 class='detail-title'>{info.title}</h1>
-          <nut-row class='detail-src'>
-            <nut-col span={4}>
-              <nut-avatar icon={info.pic} />
-            </nut-col>
-            <nut-col span={20}>
-              <p class='detail-src-name'>{info.src}</p>
-              <p class='detail-src-time'>{info.time}</p>
-            </nut-col>
-          </nut-row>
+          <UserAvatar name={info.src} icon={info.pic} desc={info.time} />
           <section class='detail-content' vHtml={info.content} />
           <nut-grid direction='horizontal' iconSize='20px' border={false} column-num={3}>
             <nut-grid-item icon='https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico'>
