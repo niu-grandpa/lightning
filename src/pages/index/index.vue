@@ -26,7 +26,12 @@ const App = computed(() => () => (
   <>
     {/**海报页 */}
     {showIndexImage.value && (
-      <nut-popup visible={showIndexImage.value} duration='2' overlay={false} position='bottom'>
+      <nut-popup
+        destroy-on-close={false}
+        visible={showIndexImage.value}
+        duration='2'
+        overlay={false}
+        position='bottom'>
         <section class='index-welcome'>
           <figure class='index-welcome-figure'>
             <HomeLogo />
@@ -37,18 +42,14 @@ const App = computed(() => () => (
       </nut-popup>
     )}
     {/**组件页面 */}
-    {
-      computed(
-        () =>
-          !showIndexImage.value && [
-            currentTab.value === 'home' && <My />,
-            currentTab.value === 'video' && <Video />,
-            currentTab.value === 'horizon' && <Horizon />,
-            currentTab.value === 'novel' && <Novel />,
-            currentTab.value === 'my' && <My />,
-          ]
-      ).value
-    }
+    {!showIndexImage.value &&
+      computed(() => [
+        currentTab.value === 'home' && <Home />,
+        currentTab.value === 'video' && <Video />,
+        currentTab.value === 'horizon' && <Horizon />,
+        currentTab.value === 'novel' && <Novel />,
+        currentTab.value === 'my' && <My />,
+      ]).value}
     {/**底部tab栏 */}
     <nut-tabbar vModel:visible={currentTab.value} bottom safeAreaInsetBottom activeColor='#1989fa'>
       {TabbarItem.map(({ text, name, icon }) => (

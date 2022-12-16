@@ -9,7 +9,7 @@ const nums = [1, 2, 3];
 
 watchEffect(onCleanup => {
   const timer = setTimeout(() => {
-    if (props.loading && !props.error) {
+    if (props.loading) {
       Taro.showLoading({ title: '加载中...' });
     } else {
       Taro.hideLoading();

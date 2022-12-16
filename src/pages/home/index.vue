@@ -54,7 +54,7 @@ const initData = () => {
 };
 
 const updateNewsList = (channel = tabChannel.value) => {
-  tabChannel.value = channel;
+  tabChannel.value !== channel && (tabChannel.value = channel);
 
   const loadList = useGetNewsList(
     res => requsetCallback(res, channel),

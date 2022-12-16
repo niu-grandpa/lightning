@@ -102,6 +102,7 @@ const HomeSearchBar = computed(() => ({ className }: { className?: string }) => 
 
     <nut-popup
       visible={visible.value}
+      destroy-on-close={false}
       overlay={false}
       position='right'
       class='home-search-view'
