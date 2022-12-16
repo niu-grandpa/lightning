@@ -60,7 +60,7 @@ const NewsComment = computed(() => () => (
             </nut-col>
             <nut-col span={17} style={{ marginLeft: '14px' }}>
               <p class='news-comment-name'>匿名用户</p>
-              <p>{{ item }}</p>
+              <p>{item}</p>
             </nut-col>
             <nut-col span={2}>
               <nut-icon name='fabulous' style={{ marginLeft: '26px' }} />
@@ -73,7 +73,7 @@ const NewsComment = computed(() => () => (
       <nut-row>
         <nut-col span={14}>
           <nut-searchbar
-            vMmodel={content.value}
+            vModel={content.value}
             placeholder='我来说两句'
             clearable={false}
             inputBackground='#f6f7f9'

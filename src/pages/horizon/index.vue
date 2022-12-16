@@ -1,25 +1,35 @@
-<template>
-  <home-container>
-    <figure class="horizon-logo">
-      <home-logo />
+<script setup lang="tsx">
+import { computed } from 'vue';
+import { HomeContainer, HomeLogo, HomeSearchbar } from '../../components';
+
+const list = [
+  { iconColor: '#2ea64c', icon: 'lower', text: '下载管理' },
+  { iconColor: '#2e40ea', icon: 'category', text: '收藏书签' },
+  { iconColor: '#fbc015', icon: 'clock', text: '历史记录' },
+  { iconColor: '#fa6a35', icon: 'date', text: '万年历' },
+  { iconColor: '', icon: 'addfollow', text: '添加' },
+];
+
+const Component = computed(() => () => (
+  <HomeContainer>
+    <figure class='horizon-logo'>
+      <HomeLogo />
     </figure>
-    <section class="horizon-content">
-      <home-searchbar />
-      <nut-grid class="horizon-content-apps" :border="false" :column-num="5" clickable>
-        <nut-grid-item icon-color="#2ea64c" icon="lower" text="下载管理" />
-        <nut-grid-item icon-color="#2e40ea" icon="category" text="收藏书签" />
-        <nut-grid-item icon-color="#fbc015" icon="clock" text="历史记录" />
-        <nut-grid-item icon-color="#fa6a35" icon="date" text="万年历" />
-        <nut-grid-item icon="addfollow" text="添加" />
+    <section class='horizon-content'>
+      <HomeSearchbar />
+      <nut-grid class='horizon-content-apps' border={false} column-num={5} clickable>
+        {list.map(({ icon, text, iconColor }) => (
+          <nut-grid-item {...{ icon, text, iconColor }} />
+        ))}
       </nut-grid>
     </section>
-  </home-container>
-</template>
-
-<script setup lang="ts">
-import {} from 'vue';
-import { HomeContainer, HomeLogo, HomeSearchbar } from '../../components';
+  </HomeContainer>
+));
 </script>
+
+<template>
+  <Component />
+</template>
 
 <style lang="less">
 .horizon {

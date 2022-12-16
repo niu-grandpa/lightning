@@ -1,9 +1,11 @@
-<template>
-  <section>视频</section>
-</template>
+<script setup lang="tsx">
+import { computed } from 'vue';
 
-<script setup lang="ts">
-import {} from 'vue';
+const Component = computed(() => () => <></>);
 </script>
+
+<template>
+  <Component />
+</template>
 
 <style lang="less"></style>

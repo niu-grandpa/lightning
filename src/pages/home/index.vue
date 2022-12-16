@@ -54,12 +54,12 @@ const initData = () => {
 };
 
 const updateNewsList = (channel = tabChannel.value) => {
+  tabChannel.value = channel;
+
   const loadList = useGetNewsList(
     res => requsetCallback(res, channel),
     () => (error.value = true)
   );
-
-  tabChannel.value = channel;
 
   let num = 5;
   let { start } = otherList.value;
