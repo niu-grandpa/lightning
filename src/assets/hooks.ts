@@ -13,6 +13,7 @@ import {
   GetCartoonParams,
   getCartoonChapter,
   CartoonChapterReturnType,
+  getCartoonContent,
 } from './https';
 
 export type EngineApi = 'shenma' | 'baidu' | 'bing';
@@ -211,6 +212,26 @@ export const useCartoonChapter = (
   useRequstHook<CartoonChapterReturnType>(
     async () => {
       const data = await getCartoonChapter(cartoonId);
+      return data;
+    },
+    callback,
+    failed
+  );
+};
+
+/**
+ * useCartoonContent
+ * @description 获取漫画章节的内容
+ * @param chapterId 章节id
+ */
+export const useCartoonContent = (
+  chapterId: string,
+  callback: (data: string[]) => any,
+  failed?: () => void
+) => {
+  useRequstHook<string[]>(
+    async () => {
+      const data = await getCartoonContent(chapterId);
       return data;
     },
     callback,
