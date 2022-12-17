@@ -12,7 +12,7 @@ export default <TabbarItemObj[]>[
     text: '首页',
     icon: 'home',
     name: 'home',
-    component: defineAsyncComponent(() => import('../pages/cartoon/index.vue')),
+    component: defineAsyncComponent(() => import('../pages/person/index.vue')),
   },
   {
     text: '视频',

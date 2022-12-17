@@ -2,6 +2,7 @@
 import Taro from '@tarojs/taro';
 import { computed, ref } from 'vue';
 import { HomeContainer, UserAvatar } from '../../components';
+import { useMailLogin } from '../../assets/hooks';
 import OptionsCard from './components/options-card.vue';
 
 const commonlyUsed = [
@@ -27,43 +28,97 @@ const easyLife = [
   { text: '游戏中心', icon: 'people', url: '' },
 ];
 
-const userInfo = ref<Taro.UserInfo>();
-const isLogin = ref(false);
+const modal = ref(false);
+const userInfo = ref({
+  nickName: Taro.getStorageSync('username') || '',
+  avatarUrl: 'my',
+});
+const mailInfo = ref<{ account: string; password: string }>({ account: '', password: '' });
+const isLogin = ref<boolean>(JSON.parse(Taro.getStorageSync('login') || 'false'));
 
-const handleLogin = () => {
-  if (userInfo.value?.nickName) return;
+const wxSelfLogin = () => {
+  if (isLogin.value) return;
   Taro.getUserProfile({
     desc: '将作为登录浏览器小程序的帐号',
-  })
-    .then(({ userInfo: data }) => {
-      userInfo.value = data;
-      isLogin.value = true;
-    })
-    .catch(err => {
-      console.log(err);
-      Taro.showToast({ title: '若重新登录可以点击头像', icon: 'none' });
-    });
+  }).then(({ userInfo: data }) => {
+    userInfo.value = data;
+    isLogin.value = true;
+    cacheLoginStatus();
+  });
+};
+
+const mailLogin = () => {
+  const { account, password } = mailInfo.value;
+  if (!account && !password) {
+    Taro.showToast({ title: '请输入邮箱和密码', icon: 'none' });
+    return;
+  } else if (!account) {
+    Taro.showToast({ title: '请输入邮箱', icon: 'none' });
+    return;
+  } else if (!password) {
+    Taro.showToast({ title: '请输入密码', icon: 'none' });
+    return;
+  }
+  useMailLogin(account, password, res => {
+    isLogin.value = true;
+    userInfo.value.nickName = res.result.account;
+    cacheLoginStatus();
+    Taro.showToast({ title: '登录成功' });
+  });
+};
+
+const cacheLoginStatus = () => {
+  const login = Taro.getStorageSync('login');
+  const username = Taro.getStorageSync('username');
+  if (!login) Taro.setStorageSync('login', JSON.stringify(isLogin.value));
+  if (!username) Taro.setStorageSync('username', userInfo.value.nickName);
 };
 
 const Fore = computed(() => () => (
   <nut-popup
-    visible
+    visible={!isLogin.value}
     position='left'
     overlay={false}
     destroy-on-close={false}
     style={{ width: '100%', height: '89%' }}>
     <section
-      onClick={handleLogin}
       style={{
         height: '100%',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-      <nut-avatar icon='my' size='large' />
-      <p style={{ marginTop: '10px', fontSize: '22px' }}>点击登录</p>
+      <nut-button type='success' style={{ marginRight: '5px' }} onClick={wxSelfLogin}>
+        微信登录
+      </nut-button>
+      <nut-button color='#7232dd' onClick={() => !isLogin.value && (modal.value = true)}>
+        邮箱登录
+      </nut-button>
     </section>
+
+    <nut-dialog
+      title='登录'
+      vModel:visible={modal.value}
+      onOk={mailLogin}
+      close-on-click-overlay={false}
+      content={
+        <>
+          <nut-input
+            required
+            vModel={mailInfo.value.account}
+            label='邮箱'
+            placeholder='请输入邮箱'
+          />
+          <nut-input
+            required
+            vModel={mailInfo.value.password}
+            label='密码'
+            placeholder='请输入密码'
+            type='password'
+          />
+        </>
+      }
+    />
   </nut-popup>
 ));
 
@@ -72,6 +127,7 @@ const My = computed(() => () => (
     <div className='person-setting'>
       <nut-icon name='setting' />
     </div>
+
     <nut-row class='person-top'>
       <nut-col span='20'>
         <UserAvatar
@@ -80,12 +136,14 @@ const My = computed(() => () => (
           desc='VIP4'
         />
       </nut-col>
+
       <nut-col span='4'>
         <nut-button style={{ marginTop: '28px' }} color='#7232dd' size='small'>
           签到
         </nut-button>
       </nut-col>
     </nut-row>
+
     <nut-grid border={false}>
       {['书签', '历史', '下载', '关注'].map((text, i) => (
         <nut-grid-item {...{ text }} key={text}>
@@ -93,6 +151,7 @@ const My = computed(() => () => (
         </nut-grid-item>
       ))}
     </nut-grid>
+
     <OptionsCard title='常用功能' list={commonlyUsed} />
     <OptionsCard title='我的服务' list={myService} />
     <OptionsCard title='便捷生活' list={easyLife} />

@@ -14,6 +14,8 @@ import {
   getCartoonChapter,
   CartoonChapterReturnType,
   getCartoonContent,
+  mailLogin,
+  MailLoginReturnType,
 } from './https';
 
 export type EngineApi = 'shenma' | 'baidu' | 'bing';
@@ -232,6 +234,26 @@ export const useCartoonContent = (
   useRequstHook<string[]>(
     async () => {
       const data = await getCartoonContent(chapterId);
+      return data;
+    },
+    callback,
+    failed
+  );
+};
+
+/**
+ * useMailLogin
+ * @description 使用邮箱和密码登录
+ */
+export const useMailLogin = (
+  account: string,
+  password: string,
+  callback: (data: MailLoginReturnType) => any,
+  failed?: () => void
+) => {
+  useRequstHook<MailLoginReturnType>(
+    async () => {
+      const data = await mailLogin(account, password);
       return data;
     },
     callback,

@@ -126,6 +126,25 @@ export const getCartoonContent = async (chapterId: string): Promise<string[]> =>
   return data['data'];
 };
 
+/**
+ * 邮箱登录
+ * @see https://api.apiopen.top/swagger/index.html#/用户接口/post_login
+ */
+export const mailLogin = async (
+  account: string,
+  password: string
+): Promise<MailLoginReturnType> => {
+  const { data } = await Taro.request<MailLoginReturnType>({
+    url: `https://api.apiopen.top/api/login`,
+    method: 'POST',
+    data: {
+      account,
+      password,
+    },
+  });
+  return data;
+};
+
 export type GetNewsParams = {
   /**	频道 */
   channel: NewsCategory;
@@ -244,4 +263,18 @@ export type CartoonChapterReturnType = {
   descs: string;
   title: string;
   updateTime: string;
+};
+
+export type MailLoginReturnType = {
+  code: number;
+  message: string;
+  result: {
+    account: string;
+    createdAt: string;
+    deletedAt: string;
+    id: number;
+    level: number;
+    token: string;
+    updatedAt: string;
+  };
 };
