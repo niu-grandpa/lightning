@@ -43,4 +43,5 @@ const HomeResult = computed(() => () => (
 
 <template>
   <HomeResult />
+  <slot v-if="!props.loading && !props.error" />
 </template>

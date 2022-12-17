@@ -65,7 +65,7 @@ const handleChangeEngine = () => {
 };
 
 const handleToWebView = (state: string, idx = 0) => {
-  Taro.navigateTo({ url: `../out/index?search=${state}&engine=${engineObj.en[idx]}` });
+  Taro.navigateTo({ url: `../views/out/index?search=${state}&engine=${engineObj.en[idx]}` });
 };
 
 const handleMicro = () => {

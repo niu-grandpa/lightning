@@ -8,6 +8,11 @@ import {
   getWeather,
   getHaoKanVideo,
   WeatherType,
+  CartoonReturnType,
+  searchCartoon,
+  GetCartoonParams,
+  getCartoonChapter,
+  CartoonChapterReturnType,
 } from './https';
 
 export type EngineApi = 'shenma' | 'baidu' | 'bing';
@@ -151,7 +156,6 @@ export const useGetNewsList = (
 /**
  * useWeather
  * @description 获取天气接口的数据
- * @param callback 成功后的回调
  */
 export const useWeather = (callback: (data: WeatherType) => any) => {
   useRequstHook(async () => {
@@ -165,7 +169,6 @@ export const useWeather = (callback: (data: WeatherType) => any) => {
  * useShortVideo
  * @description 获取随机短视频，数据来源于《好看视频》
  * @param page 页码
- * @param callback 成功后的回调
  * @see https://api.apiopen.top/swagger/index.html#/开放接口/get_getHaoKanVideo
  */
 export const useShortVideo = (page: number, callback: (data: VideoReturnType[]) => any) => {
@@ -175,13 +178,56 @@ export const useShortVideo = (page: number, callback: (data: VideoReturnType[]) 
   }, callback);
 };
 
+/**
+ * useSearchCartoon
+ * @description 获取漫画查询结果
+ * @param obj 查询参数
+ */
+export const useSearchCartoon = (
+  obj: GetCartoonParams,
+  callback: (data: CartoonReturnType[]) => any,
+  failed?: () => void
+) => {
+  useRequstHook<CartoonReturnType[]>(
+    async () => {
+      const data = await searchCartoon(obj);
+      return data;
+    },
+    callback,
+    failed
+  );
+};
+
+/**
+ * useCartoonChapter
+ * @description 获取漫画章节
+ * @param cartoonId 漫画id
+ */
+export const useCartoonChapter = (
+  cartoonId: string,
+  callback: (data: CartoonChapterReturnType) => any,
+  failed?: () => void
+) => {
+  useRequstHook<CartoonChapterReturnType>(
+    async () => {
+      const data = await getCartoonChapter(cartoonId);
+      return data;
+    },
+    callback,
+    failed
+  );
+};
+
 const useRequstHook = <T>(
   requsetCb: () => Promise<T>,
   success: (data: T) => any,
   failed?: () => void
 ) => {
   const requset = async () => {
-    return await requsetCb();
+    Taro.showLoading();
+    const data = await requsetCb();
+    Taro.hideLoading();
+    return data;
   };
   requset()
     .then((res: T) => success(res))

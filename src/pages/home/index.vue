@@ -103,7 +103,7 @@ const goToDetailPage = (data: NewsListResult) => {
   if (!Object.keys(data).length) return;
   Taro.preload({ info: data });
   Taro.navigateTo({
-    url: '../out/news-detail',
+    url: '../views/home/news-detail',
   });
 };
 

@@ -2,19 +2,17 @@
 // 因此子模块的路由路径都放在对应主位置
 
 const INDEX = 'pages/index';
-const HOME = 'pages/home';
 const VIDEO = 'pages/video';
 const HORIZON = 'pages/horizon';
-const Cartoon = 'pages/cartoon';
 const PERSON = 'pages/person';
-const OUT = 'pages/out';
+const VIEWS = 'pages/views';
 
 export default {
   index: [`${INDEX}/index`],
-  out: [`${OUT}/index`, `${OUT}/news-detail`],
-  home: [],
+  out: [`${VIEWS}/out/index`],
+  home: [`${VIEWS}/home/news-detail`],
   video: [],
   horizon: [],
-  cartoon: [`${Cartoon}/catalog`, `${Cartoon}/content`],
+  cartoon: [`${VIEWS}/cartoon/catalog/index`, `${VIEWS}/cartoon/content/index`],
   person: [],
 };

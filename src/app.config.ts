@@ -1,9 +1,9 @@
 import routes from './assets/routes';
 
-const { index, home, video, horizon, novel, person, out } = routes;
+const { index, home, video, horizon, cartoon, person, out } = routes;
 
 export default defineAppConfig({
-  pages: [...index, ...home, ...video, ...horizon, ...novel, ...person, ...out],
+  pages: [...index, ...home, ...video, ...horizon, ...cartoon, ...person, ...out],
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#fff',

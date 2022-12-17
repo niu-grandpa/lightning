@@ -97,7 +97,7 @@ export const searchCartoon = async ({
   size,
 }: GetCartoonParams): Promise<CartoonReturnType[]> => {
   const { data } = await Taro.request<CartoonReturnType[]>({
-    url: `https://api.pingcc.cn/comic/search/${type}/${word}/${page}/${size}`,
+    url: `https://api.pingcc.cn/comic/search/${type}/${word}/${page || 1}/${size || 10}`,
   });
   return data['data'];
 };
@@ -107,8 +107,8 @@ export const searchCartoon = async ({
  * @param cartoonId 通过漫画搜索API获取到comicId
  * @see https://easydoc.net/doc/45910076/WP3yrgI7/y7dPKWPZ
  */
-export const getCartoonChapter = async (cartoonId: string): Promise<CartoonChapterReturnType[]> => {
-  const { data } = await Taro.request<CartoonChapterReturnType[]>({
+export const getCartoonChapter = async (cartoonId: string): Promise<CartoonChapterReturnType> => {
+  const { data } = await Taro.request<CartoonChapterReturnType>({
     url: `https://api.pingcc.cn/comicChapter/search/${cartoonId}`,
   });
   return data['data'];
@@ -135,15 +135,15 @@ export type GetNewsParams = {
   start: number;
 };
 
-type GetCartoonParams = {
+export type GetCartoonParams = {
   /** 搜索项 title ，author ，comicType */
-  type: string;
+  type: 'title' | 'author' | 'comicType';
   /**搜索关键字 */
   word: string;
   /**当前页数，留空默认1 */
-  page: number;
+  page?: number;
   /**一页显示的数量，留空默认10，最多30 */
-  size: number;
+  size?: number;
 };
 
 /**
