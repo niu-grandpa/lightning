@@ -3,10 +3,10 @@ import { computed, onMounted, ref, watchEffect, type App, type Plugin } from 'vu
 import {
   type GetNewsParams,
   type NewsListResult,
+  type VideoReturnType,
   getNewsList,
   getWeather,
-  getHotVideos,
-  ShortVideosReturnType,
+  getHaoKanVideo,
   WeatherType,
 } from './https';
 
@@ -162,17 +162,17 @@ export const useWeather = (callback: (data: WeatherType) => any) => {
 };
 
 /**
- * useHotVideos
- * @description 获取快手随机短视频
+ * useShortVideo
+ * @description 获取随机短视频，数据来源于《好看视频》
+ * @param page 页码
  * @param callback 成功后的回调
+ * @see https://api.apiopen.top/swagger/index.html#/开放接口/get_getHaoKanVideo
  */
-export const useHotVideos = (nums: number, callback: (data: ShortVideosReturnType) => any) => {
-  for (let i = 0; i < nums; i++) {
-    useRequstHook(async () => {
-      const data = await getHotVideos();
-      return data;
-    }, callback);
-  }
+export const useShortVideo = (page: number, callback: (data: VideoReturnType[]) => any) => {
+  useRequstHook<VideoReturnType[]>(async () => {
+    const data = await getHaoKanVideo(page);
+    return data;
+  }, callback);
 };
 
 const useRequstHook = <T>(
@@ -183,11 +183,9 @@ const useRequstHook = <T>(
   const requset = async () => {
     return await requsetCb();
   };
-  onMounted(() => {
-    requset()
-      .then((res: T) => success(res))
-      .catch(() => {
-        failed?.();
-      });
-  });
+  requset()
+    .then((res: T) => success(res))
+    .catch(() => {
+      failed?.();
+    });
 };

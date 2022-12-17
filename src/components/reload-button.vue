@@ -1,8 +1,17 @@
 <script lang="tsx" setup>
+import Taro from '@tarojs/taro';
 import { computed } from 'vue';
 
+const emits = defineEmits<{ (event: 'click'): void }>();
+
+const handleClick = () => {
+  emits('click');
+  Taro.showToast({ title: '', icon: 'loading' });
+  Taro.pageScrollTo({ scrollTop: 0 });
+};
+
 const ReloadButton = computed(() => () => (
-  <div class='reload-btn'>
+  <div class='reload-btn' onClick={handleClick}>
     <nut-icon name='refresh2' />
   </div>
 ));

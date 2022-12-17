@@ -1,12 +1,14 @@
 <script lang="tsx" setup>
 import { type WeatherType } from '../../../assets/https';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useWeather } from '../../../assets/hooks';
 
 const data = ref<WeatherType>({ tmp: '', cond_txt: '', area: '' });
 
-useWeather(res => {
-  data.value = res;
+onMounted(() => {
+  useWeather(res => {
+    data.value = res;
+  });
 });
 
 const Weather = computed(

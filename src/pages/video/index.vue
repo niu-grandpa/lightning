@@ -1,53 +1,65 @@
-<script setup lang="tsx">
-import { computed, ref } from 'vue';
-import { HomeContainer, HomeSearchbar } from '../../components';
-import { Video } from '@tarojs/components';
+<script setup lang="ts">
+import { onMounted, ref, watchEffect } from 'vue';
+import { HomeContainer, HomeSearchbar, ReloadButton } from '../../components';
+import { type VideoReturnType } from '../../assets/https';
+import { useShortVideo } from '../../assets/hooks';
 
-const source = ref<string[]>([
-  'https://storage.jd.com/about/big-final.mp4?Expires=3730193075&AccessKey=3LoYX1dQWa6ZXzQl&Signature=ViMFjz%2BOkBxS%2FY1rjtUVqbopbJI%3D',
-  'http://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400',
-]);
+const source = ref<VideoReturnType[]>([]);
+const page = ref(5);
 
-const Component = computed(() => () => (
-  <HomeContainer scorllY={true} className='video-container'>
-    <HomeSearchbar />
-    {source.value.map(url => (
-      <nut-cell className='video-cell'>
-        <Video
-          className='video-cell-item'
-          key={url}
-          src={url}
-          loop={false}
-          objectFit='cover'
-          direction={-90}
-          initialTime={0}
-          controls={true}
-          autoplay={false}
-          mobilenetHintType={'2'}
-        />
-        <p>这是一个视频的简短描述!</p>
-        <nut-row className='video-cell-item-info'>
-          <nut-col span={3}>
-            <nut-avatar
-              icon='https://img12.360buyimg.com/imagetools/jfs/t1/143702/31/16654/116794/5fc6f541Edebf8a57/4138097748889987.png'
-              size='small'
-            />
-          </nut-col>
-          <nut-col span={16}>大路解说</nut-col>
-          <nut-col span={5} style={{ display: 'flex', alignItems: 'center' }}>
-            <nut-icon name='comment' />
-            <text style={{ margin: '0 5px', fontSize: '12px' }}>27</text>
-            <nut-icon name='more-s' />
-          </nut-col>
-        </nut-row>
-      </nut-cell>
-    ))}
-  </HomeContainer>
-));
+const update = () => {
+  useShortVideo(page.value, res => {
+    source.value = res;
+    console.log('视频数据', source.value);
+  });
+};
+
+onMounted(() => {
+  update();
+});
+
+watchEffect(() => {
+  if (page.value > 5) {
+    update();
+  }
+});
 </script>
 
 <template>
-  <Component />
+  <reload-button @click="() => (page += 5)" />
+  <home-container :scorll-y="true" class="video-container">
+    <home-searchbar />
+    <nut-cell class="video-cell" v-if="source.length" v-for="item in source" :key="item.id">
+      <template #title>
+        <video
+          :muted="true"
+          :controls="true"
+          play-btn-position="center"
+          class="video-cell-item"
+          :src="item.playUrl"
+          :title="item.title"
+          :loop="false"
+          objectFit="cover"
+          :direction="-90"
+          :initial-time="0"
+          :autoplay="false"
+          mobilenet-hint-type="2"
+        />
+        <p class="video-cell-item-desc">{{ item.title }}</p>
+        <nut-row class="video-cell-item-info">
+          <nut-col :span="3">
+            <nut-avatar icon="my" size="small" />
+          </nut-col>
+          <nut-col :span="16">{{ item.userName }}</nut-col>
+          <nut-col :span="5" style="display: flex; align-items: center">
+            <nut-icon name="comment" />
+            <text style="margin: 0 5px; font-size: 12px">27</text>
+            <nut-icon name="more-s" />
+          </nut-col>
+        </nut-row>
+      </template>
+    </nut-cell>
+  </home-container>
 </template>
 
 <style lang="less">
@@ -57,15 +69,21 @@ const Component = computed(() => () => (
     padding: 90px 14px;
   }
   &-cell {
-    margin-top: 35px;
+    margin: 35px 0;
+    padding: 0;
     &-item {
       width: 100%;
       height: 190px;
+      margin-bottom: 5px;
       border-radius: 22px 22px 0 0;
       &-desc,
       &-info {
         padding: 8px 12px;
         background: #fff;
+        box-sizing: border-box;
+      }
+      &-desc {
+        font-size: 16px;
       }
       &-info {
         line-height: 14px;

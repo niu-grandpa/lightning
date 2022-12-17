@@ -5,7 +5,7 @@ const INDEX = 'pages/index';
 const HOME = 'pages/home';
 const VIDEO = 'pages/video';
 const HORIZON = 'pages/horizon';
-const NOVEL = 'pages/novel';
+const Cartoon = 'pages/cartoon';
 const PERSON = 'pages/person';
 const OUT = 'pages/out';
 
@@ -15,6 +15,6 @@ export default {
   home: [],
   video: [],
   horizon: [],
-  novel: [],
+  cartoon: [`${Cartoon}/catalog`, `${Cartoon}/content`],
   person: [],
 };
