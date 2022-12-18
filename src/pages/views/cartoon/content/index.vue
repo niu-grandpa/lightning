@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Taro from '@tarojs/taro';
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { HomeContainer } from '../../../../components';
 import { type CartoonChapterReturnType } from '../../../../assets/https';
 import { useCartoonContent } from '../../../../assets/hooks';

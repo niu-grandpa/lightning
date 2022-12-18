@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { HomeContainer, HomeLogo, HomeSearchbar } from '../../components';
 
 const list = [
@@ -9,6 +9,8 @@ const list = [
   { iconColor: '#fa6a35', icon: 'date', text: '万年历' },
   { iconColor: '', icon: 'addfollow', text: '添加' },
 ];
+
+const page4 = ref(0);
 
 const Component = computed(() => () => (
   <HomeContainer>
@@ -23,6 +25,26 @@ const Component = computed(() => () => (
         ))}
       </nut-grid>
     </section>
+    <nut-swiper
+      init-page={page4.value}
+      loop
+      auto-play='3000'
+      height='150'
+      pagination-visible
+      style='height: 150px'>
+      <nut-swiper-item>
+        <image src='https://storage.360buyimg.com/jdc-article/NutUItaro34.jpg' />
+      </nut-swiper-item>
+      <nut-swiper-item>
+        <image src='https://storage.360buyimg.com/jdc-article/NutUItaro2.jpg' />
+      </nut-swiper-item>
+      <nut-swiper-item>
+        <image src='https://storage.360buyimg.com/jdc-article/welcomenutui.jpg' />
+      </nut-swiper-item>
+      <nut-swiper-item>
+        <image src='https://storage.360buyimg.com/jdc-article/fristfabu.jpg' />
+      </nut-swiper-item>
+    </nut-swiper>
   </HomeContainer>
 ));
 </script>

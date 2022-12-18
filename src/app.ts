@@ -10,4 +10,6 @@ const App = createApp({
 
 setupUIComps(App);
 
+App.config.warnHandler = () => null;
+
 export default App;
